@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file source-language="fr" target-language="fr" datatype="plaintext" original="file.ext">
+    <header>
+      <tool tool-id="symfony" tool-name="Symfony"/>
+    </header>
+    <body>
+      <trans-unit id="FxQmM7v" resname="Personnel">
+        <source>Personnel</source>
+        <target>Personnel</target>
+      </trans-unit>
+      <trans-unit id="IbERy.5" resname="Default">
+        <source>Default</source>
+        <target>Defaut</target>
+      </trans-unit>
+      <trans-unit id="9Ord4ps" resname="Matricule">
+        <source>Matricule</source>
+        <target>Matricule</target>
+      </trans-unit>
+      <trans-unit id="ssEkU20" resname="Nom">
+        <source>Nom</source>
+        <target>Nom</target>
+      </trans-unit>
+      <trans-unit id="hcAHQxK" resname="Prenoms">
+        <source>Prenoms</source>
+        <target>Prenoms</target>
+      </trans-unit>
+      <trans-unit id="baeVqGZ" resname="Genre">
+        <source>Genre</source>
+        <target>Genre</target>
+      </trans-unit>
+      <trans-unit id="fhsNVkH" resname="Account">
+        <source>Account</source>
+        <target>Compte</target>
+      </trans-unit>
+      <trans-unit id="kJc3knw" resname="Informations Personnelles">
+        <source>Informations Personnelles</source>
+        <target>Informations Personnelles</target>
+      </trans-unit>
+      <trans-unit id="2s1HYZp" resname="Compte">
+        <source>Compte</source>
+        <target>Compte</target>
+      </trans-unit>
+      <trans-unit id="PRykIbm" resname="Personnel List">
+        <source>Personnel List</source>
+        <target>liste des personnels</target>
+      </trans-unit>
+      <trans-unit id="NsY9OQr" resname="Personnel Create">
+        <source>Personnel Create</source>
+        <target>Creer un personnel</target>
+      </trans-unit>
+      <trans-unit id="WeVg9XD" resname="The friend message is comming from">
+        <source>The friend message is comming from</source>
+        <target>Les messages amis viennent de </target>
+      </trans-unit>
+      <trans-unit id="_43haIJ" resname="Your controller at">
+        <source>Your controller at</source>
+        <target>Votre controlleur a</target>
+      </trans-unit>
+      <trans-unit id="rPGZ2.r" resname="Your template at">
+        <source>Your template at</source>
+        <target>Votre template a</target>
+      </trans-unit>
+      <trans-unit id="FxpF6w4" resname="Personnes">
+        <source>Personnes</source>
+        <target>Personnes</target>
+      </trans-unit>
+      <trans-unit id="BA2w0on" resname="Personne">
+        <source>Personne</source>
+        <target>Personne</target>
+      </trans-unit>
+      <trans-unit id="0SLbkOh" resname="Personne A Contacter">
+        <source>Personne A Contacter</source>
+        <target>Personne A Contacter</target>
+      </trans-unit>
+      <trans-unit id="QSvguc1" resname="Informations">
+        <source>Informations</source>
+        <target>Informations</target>
+      </trans-unit>
+      <trans-unit id=".4BZ3Gd" resname="Actions">
+        <source>Actions</source>
+        <target>Actions</target>
+      </trans-unit>
+      <trans-unit id="k9QavDW" resname="Image File">
+        <source>Image File</source>
+        <target>Photo</target>
+      </trans-unit>
+      <trans-unit id="WU7d60z" resname="Latlng">
+        <source>Latlng</source>
+        <target>Latitude et Longitude</target>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

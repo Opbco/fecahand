@@ -1,0 +1,11 @@
+twig:
+    default_path: '%kernel.project_dir%/templates'
+    form_themes:
+        - '@SonataForm/Form/datepicker.html.twig'
+        - 'bootstrap_4_horizontal_layout.html.twig'
+        - '@OhGoogleMapFormType/Form/fields.html.twig'
+        
+
+when@test:
+    twig:
+        strict_variables: true

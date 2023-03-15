@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file source-language="fr" target-language="en" datatype="plaintext" original="file.ext">
+    <header>
+      <tool tool-id="symfony" tool-name="Symfony"/>
+    </header>
+    <body>
+      <trans-unit id="FxQmM7v" resname="Personnel">
+        <source>Personnel</source>
+        <target>Personnel</target>
+      </trans-unit>
+      <trans-unit id="IbERy.5" resname="Default">
+        <source>Default</source>
+        <target>Default</target>
+      </trans-unit>
+      <trans-unit id="ssEkU20" resname="Nom">
+        <source>Nom</source>
+        <target>Name</target>
+      </trans-unit>
+      <trans-unit id="hcAHQxK" resname="Prenoms">
+        <source>Prenoms</source>
+        <target>First name</target>
+      </trans-unit>
+      <trans-unit id="baeVqGZ" resname="Genre">
+        <source>Genre</source>
+        <target>Gender</target>
+      </trans-unit>
+      <trans-unit id="fhsNVkH" resname="Account">
+        <source>Account</source>
+        <target>Account</target>
+      </trans-unit>
+      <trans-unit id="kJc3knw" resname="Informations Personnelles">
+        <source>Informations Personnelles</source>
+        <target>Personnal Information</target>
+      </trans-unit>
+      <trans-unit id="2s1HYZp" resname="Compte">
+        <source>Compte</source>
+        <target>Account</target>
+      </trans-unit>
+      <trans-unit id="PRykIbm" resname="Personnel List">
+        <source>Personnel List</source>
+        <target>Personnel List</target>
+      </trans-unit>
+      <trans-unit id="NsY9OQr" resname="Personnel Create">
+        <source>Personnel Create</source>
+        <target>Personnel Creating</target>
+      </trans-unit>
+      <trans-unit id="WeVg9XD" resname="The friend message is comming from">
+        <source>The friend message is comming from</source>
+        <target>The friend message is comming from</target>
+      </trans-unit>
+      <trans-unit id="_43haIJ" resname="Your controller at">
+        <source>Your controller at</source>
+        <target>Your controller at</target>
+      </trans-unit>
+      <trans-unit id="rPGZ2.r" resname="Your template at">
+        <source>Your template at</source>
+        <target>Your template at</target>
+      </trans-unit>
+      <trans-unit id="FxpF6w4" resname="Personnes">
+        <source>Personnes</source>
+        <target>Persons</target>
+      </trans-unit>
+      <trans-unit id="BA2w0on" resname="Personne">
+        <source>Personne</source>
+        <target>Person</target>
+      </trans-unit>
+      <trans-unit id="0SLbkOh" resname="Personne A Contacter">
+        <source>Personne A Contacter</source>
+        <target>Person to contact</target>
+      </trans-unit>
+      <trans-unit id="QSvguc1" resname="Informations">
+        <source>Informations</source>
+        <target>Information</target>
+      </trans-unit>
+      <trans-unit id=".4BZ3Gd" resname="Actions">
+        <source>Actions</source>
+        <target>Actions</target>
+      </trans-unit>
+      <trans-unit id="k9QavDW" resname="Image File">
+        <source>Image File</source>
+        <target>Picture</target>
+      </trans-unit>
+      <trans-unit id="WU7d60z" resname="Latlng">
+        <source>Latlng</source>
+        <target>Latitude and Longitude</target>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

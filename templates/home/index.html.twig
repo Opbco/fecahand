@@ -1,0 +1,36 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello HomeController!{% endblock %}
+
+{% block body %}
+<style>
+    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
+    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
+</style>
+
+<div {{ react_component('Hello', { 'fullName': 'brice.mich@gmail.com' }) }}></div>
+<div>
+    <ul>
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="dropdown-language" role="button"
+                data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                {{ app.request.locale|locale_name(app.request.locale)|u.title }}
+            </a>
+            <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdown-language">
+                <li><a class="dropdown-item" href="{{ path('app_home', {_locale: 'en'}) }}">English</a></li>
+                <li><a class="dropdown-item" href="{{ path('app_home', {_locale: 'fr'}) }}">Français</a></li>
+            </ul>
+        </li>
+    </ul>
+</div>
+
+<div class="example-wrapper">
+    <h1>Hello {{ controller_name }}! ✅</h1>
+
+    {{ 'The friend message is comming from'|trans }}
+    <ul>
+        <li>{{ 'Your controller at'|trans }} <code><a href="{{ '/opt/lampp/htdocs/univ-soa-msi/src/Controller/HomeController.php'|file_link(0) }}">src/Controller/HomeController.php</a></code></li>
+        <li>{{ 'Your template at'|trans }} <code><a href="{{ '/opt/lampp/htdocs/univ-soa-msi/templates/home/index.html.twig'|file_link(0) }}">templates/home/index.html.twig</a></code></li>
+    </ul>
+</div>
+{% endblock %}
