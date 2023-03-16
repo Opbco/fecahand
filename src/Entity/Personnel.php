@@ -114,7 +114,7 @@ class Personnel
     #[Assert\File(maxSize: '4096k', maxSizeMessage: 'Image trop lourde, maximum 4Mo', mimeTypes:['image/jpg', 'image/jpeg', 'image/gif', 'image/png'], mimeTypesMessage:'seule les fichiers jpg, jpeg, png et gif sont acceptes')]
     private ?UploadedFile $imageFile = null;
 
-    #[Assert\File(maxSize: '2048k', maxSizeMessage: 'Image trop lourde, maximum 2Mo', mimeTypes:['application/pdf'], mimeTypesMessage:'seule les fichiers pdf sont acceptes')]
+    #[Assert\File(maxSize: '2048k', maxSizeMessage: 'Pdf trop lourde, maximum 2Mo', mimeTypes:['application/pdf'], mimeTypesMessage:'seule les fichiers pdf sont acceptes')]
     private ?UploadedFile $cniScanFile = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
@@ -132,12 +132,16 @@ class Personnel
     #[ORM\OneToMany(mappedBy: 'personne', targetEntity: CertificatAptitude::class, orphanRemoval: true)]
     private Collection $certificatAptitudes;
 
+    #[ORM\OneToMany(mappedBy: 'personne', targetEntity: Diplome::class, orphanRemoval: true, cascade: ['persist', 'remove'])]
+    private Collection $diplomes;
+
     public function __construct()
     {
         $this->contrats = new ArrayCollection();
         $this->licences = new ArrayCollection();
         $this->insurances = new ArrayCollection();
         $this->certificatAptitudes = new ArrayCollection();
+        $this->diplomes = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -648,6 +652,36 @@ class Personnel
             // set the owning side to null (unless already changed)
             if ($certificatAptitude->getPersonne() === $this) {
                 $certificatAptitude->setPersonne(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Diplome>
+     */
+    public function getDiplomes(): Collection
+    {
+        return $this->diplomes;
+    }
+
+    public function addDiplome(Diplome $diplome): self
+    {
+        if (!$this->diplomes->contains($diplome)) {
+            $this->diplomes->add($diplome);
+            $diplome->setPersonne($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDiplome(Diplome $diplome): self
+    {
+        if ($this->diplomes->removeElement($diplome)) {
+            // set the owning side to null (unless already changed)
+            if ($diplome->getPersonne() === $this) {
+                $diplome->setPersonne(null);
             }
         }
 

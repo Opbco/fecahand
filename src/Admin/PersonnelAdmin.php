@@ -20,6 +20,7 @@ use Sonata\DoctrineORMAdminBundle\Datagrid\ProxyQueryInterface;
 use Sonata\DoctrineORMAdminBundle\Filter\CallbackFilter;
 use Sonata\DoctrineORMAdminBundle\Filter\DateTimeFilter;
 use Sonata\Form\Type\BooleanType;
+use Sonata\Form\Type\CollectionType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -27,7 +28,9 @@ use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Sonata\Form\Validator\ErrorElement;
 use Sonata\Form\Type\DatePickerType;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
@@ -167,12 +170,35 @@ final class PersonnelAdmin extends AbstractAdmin
                 ->end()
             ->end()
             ->tab('Personne a contacter')
-            ->with('Informations personnelles', ['class' => 'col-md-6'])
-            ->add('personneContactNom', TextType::class, array('label' => 'Nom complet', 'required' => false))
-            ->add('personneContactQualite', TextType::class, array('label' => 'En qualite de', 'required' => false))
-            ->add('personneContactPhone', NumberType::class, array('label' => 'Contacts', 'required' => false))
-            ->add('personneContactAdresse', TextareaType::class, array('label' => 'Adresse', 'required' => false))
+                ->with('Informations personnelles', ['class' => 'col-md-6'])
+                    ->add('personneContactNom', TextType::class, array('label' => 'Nom complet', 'required' => false))
+                    ->add('personneContactQualite', TextType::class, array('label' => 'En qualite de', 'required' => false))
+                    ->add('personneContactPhone', NumberType::class, array('label' => 'Contacts', 'required' => false))
+                    ->add('personneContactAdresse', TextareaType::class, array('label' => 'Adresse', 'required' => false))
+                ->end()
             ->end()
+            ->tab('Documentation')
+                ->with('Diplomes', ['class' => 'col-md-12'])
+                    ->add('diplomes', CollectionType::class, [
+                        'type_options' => [
+                            // Prevents the "Delete" option from being displayed
+                            'delete' => true,
+                            'delete_options' => [
+                                // You may otherwise choose to put the field but hide it
+                                'type'         => CheckboxType::class,
+                                // In that case, you need to fill in the options as well
+                                'type_options' => [
+                                    'mapped'   => false,
+                                    'required' => false,
+                                ]
+                            ]
+                        ]
+                    ], [
+                        'edit' => 'inline',
+                        'inline' => 'table',
+                        'sortable' => 'position',
+                    ])
+                ->end()
             ->end();
     }
 

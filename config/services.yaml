@@ -35,3 +35,10 @@ services:
         class: App\Admin\PersonnelAdmin
         tags:
             - { name: sonata.admin, model_class: App\Entity\Personnel, manager_type: orm, label: Personnes }
+
+    admin.diplome:
+        class: App\Admin\DiplomeAdmin
+        calls:
+            - [setTranslationDomain, ['App']]
+        tags:
+            - { name: sonata.admin, model_class: App\Entity\Diplome, manager_type: orm, label: Diplomes }

@@ -3,12 +3,15 @@
 namespace App\Entity;
 
 use App\Repository\DiplomeRepository;
+use App\Trait\PdfTrait;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: DiplomeRepository::class)]
 class Diplome
 {
+    use PdfTrait;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -23,9 +26,14 @@ class Diplome
     #[ORM\Column(length: 255)]
     private ?string $institution = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $scanCopy = null;
+    #[ORM\ManyToOne(inversedBy: 'diplomes')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Personnel $personne = null;
 
+    public function __toString()
+    {
+        return $this->nom.' ('.$this->institution.')';
+    }
     public function getId(): ?int
     {
         return $this->id;
@@ -67,14 +75,14 @@ class Diplome
         return $this;
     }
 
-    public function getScanCopy(): ?string
+    public function getPersonne(): ?Personnel
     {
-        return $this->scanCopy;
+        return $this->personne;
     }
 
-    public function setScanCopy(string $scanCopy): self
+    public function setPersonne(?Personnel $personne): self
     {
-        $this->scanCopy = $scanCopy;
+        $this->personne = $personne;
 
         return $this;
     }
