@@ -22,6 +22,7 @@ services:
         exclude:
             - '../src/DependencyInjection/'
             - '../src/Entity/'
+            - '../src/Form/Transformer/'
             - '../src/Kernel.php'
 
     # add more service definitions when explicit configuration is needed
@@ -31,14 +32,71 @@ services:
             $targetDirectory: '%files_directory%'
             
     #sonata admin services
+    admin.region:
+        class: App\Admin\RegionAdmin
+        tags:
+            - { name: sonata.admin, model_class: App\Entity\Region, group: Localisation, icon: 'fas fa-location-arrow',  manager_type: orm, label: Regions }
+        calls:
+            - [addChild, ['@admin.departement', 'region']]
+            - [setTranslationDomain, ['App']]
+
+    admin.departement:
+        class: App\Admin\DepartementAdmin
+        calls:
+            - [setTranslationDomain, ['App']]
+        tags:
+            - { name: sonata.admin, model_class: App\Entity\Departement, manager_type: orm, group: Localisation, label: Departement }
+
+    admin.stade:
+        class: App\Admin\StadeAdmin
+        calls:
+            - [setTranslationDomain, ['App']]
+        tags:
+            - { name: sonata.admin, model_class: App\Entity\Stade, manager_type: orm, group: Clubs, icon: 'fab fa-artstation', label: Stades }
+
+
     admin.personnel:
         class: App\Admin\PersonnelAdmin
         tags:
-            - { name: sonata.admin, model_class: App\Entity\Personnel, manager_type: orm, label: Personnes }
+            - { name: sonata.admin, model_class: App\Entity\Personnel, group: Acteurs, icon: 'fas fa-users-cog',  manager_type: orm, label: Personnes }
+        calls:
+            - [addChild, ['@admin.personnel_position', 'personnel']]
+            - [addChild, ['@admin.diplome', 'personne']]
+            - [addChild, ['@admin.aptitude', 'personne']]
+            - [addChild, ['@admin.insurance', 'personnel']]
+            - [setTranslationDomain, ['App']]
 
     admin.diplome:
         class: App\Admin\DiplomeAdmin
         calls:
             - [setTranslationDomain, ['App']]
         tags:
-            - { name: sonata.admin, model_class: App\Entity\Diplome, manager_type: orm, label: Diplomes }
+            - { name: sonata.admin, model_class: App\Entity\Diplome, manager_type: orm, group: Acteurs, label: Diplome }
+
+    admin.aptitude:
+        class: App\Admin\CertificatAptitudeAdmin
+        calls:
+            - [setTranslationDomain, ['App']]
+        tags:
+            - { name: sonata.admin, model_class: App\Entity\CertificatAptitude, manager_type: orm, group: Acteurs, label: Certificat Aptitude }
+    
+    admin.insurance:
+        class: App\Admin\InsuranceAdmin
+        calls:
+            - [setTranslationDomain, ['App']]
+        tags:
+            - { name: sonata.admin, model_class: App\Entity\Insurance, manager_type: orm, group: Acteurs, label: Assurance }
+
+    admin.position:
+        class: App\Admin\PositionAdmin
+        calls:
+            - [setTranslationDomain, ['App']]
+        tags:
+            - { name: sonata.admin, model_class: App\Entity\Position, manager_type: orm, group: Acteurs, label: Positions }
+
+    admin.personnel_position:
+        class: App\Admin\PersonnelPositionAdmin
+        calls:
+            - [setTranslationDomain, ['App']]
+        tags:
+            - { name: sonata.admin, model_class: App\Entity\PersonnelPosition, manager_type: orm, group: Acteurs, label: Personnes et Position }

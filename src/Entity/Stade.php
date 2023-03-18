@@ -7,10 +7,14 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Oh\GoogleMapFormTypeBundle\Traits\LocationTrait;
 
 #[ORM\Entity(repositoryClass: StadeRepository::class)]
 class Stade
 {
+
+    use LocationTrait;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -18,9 +22,6 @@ class Stade
 
     #[ORM\Column(length: 255)]
     private ?string $nom = null;
-
-    #[ORM\Column]
-    private array $localisation = [];
 
     #[ORM\Column]
     private array $dimension = [];
@@ -31,7 +32,7 @@ class Stade
     #[ORM\Column(length: 255)]
     private ?string $comment = null;
 
-    #[ORM\Column(type: Types::SMALLINT)]
+    #[ORM\Column(type: Types::SMALLINT, nullable:true, options:['default'=>1])]
     private ?int $status = null;
 
     #[ORM\ManyToOne]
@@ -59,18 +60,6 @@ class Stade
     public function setNom(string $nom): self
     {
         $this->nom = $nom;
-
-        return $this;
-    }
-
-    public function getLocalisation(): array
-    {
-        return $this->localisation;
-    }
-
-    public function setLocalisation(array $localisation): self
-    {
-        $this->localisation = $localisation;
 
         return $this;
     }

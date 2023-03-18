@@ -5,8 +5,10 @@ namespace App\Admin;
 
 use App\Entity\Personnel;
 use App\Entity\User;
+use Knp\Menu\ItemInterface;
 use Oh\GoogleMapFormTypeBundle\Form\Type\GoogleMapType;
 use Sonata\AdminBundle\Admin\AbstractAdmin;
+use Sonata\AdminBundle\Admin\AdminInterface;
 use Sonata\AdminBundle\Datagrid\DatagridInterface;
 use Sonata\AdminBundle\Datagrid\DatagridMapper;
 use Sonata\AdminBundle\Datagrid\ListMapper;
@@ -30,7 +32,6 @@ use Sonata\Form\Type\DatePickerType;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
@@ -48,7 +49,7 @@ final class PersonnelAdmin extends AbstractAdmin
     public function toString(object $object): string
     {
         return $object instanceof Personnel
-            ? 'Personne ' . $object->getFullName()
+            ? $object->getFullName()
             : 'Personne'; // shown in the breadcrumb on the create view
     }
 
@@ -199,14 +200,57 @@ final class PersonnelAdmin extends AbstractAdmin
                         'sortable' => 'position',
                     ])
                 ->end()
+                ->with('Certificat Aptitude', ['class' => 'col-md-12'])
+                    ->add('certificatAptitudes', CollectionType::class, [
+                        'type_options' => [
+                            // Prevents the "Delete" option from being displayed
+                            'delete' => true,
+                            'delete_options' => [
+                                // You may otherwise choose to put the field but hide it
+                                'type'         => CheckboxType::class,
+                                // In that case, you need to fill in the options as well
+                                'type_options' => [
+                                    'mapped'   => false,
+                                    'required' => false,
+                                ]
+                            ]
+                        ]
+                    ], [
+                        'edit' => 'inline',
+                        'inline' => 'table',
+                        'sortable' => 'position',
+                    ])
+                ->end()
+                ->with('Assurance', ['class' => 'col-md-12'])
+                    ->add('insurances', CollectionType::class, [
+                        'type_options' => [
+                            // Prevents the "Delete" option from being displayed
+                            'delete' => true,
+                            'delete_options' => [
+                                // You may otherwise choose to put the field but hide it
+                                'type'         => CheckboxType::class,
+                                // In that case, you need to fill in the options as well
+                                'type_options' => [
+                                    'mapped'   => false,
+                                    'required' => false,
+                                ]
+                            ]
+                        ]
+                    ], [
+                        'edit' => 'inline',
+                        'inline' => 'table',
+                        'sortable' => 'position',
+                    ])
+                ->end()
             ->end();
-    }
+         }
 
     protected function configureListFields(ListMapper $list): void
     {
         $list->addIdentifier('numeroCni', null, ['label'=>'Numero CNI'])
             ->add('fullName', null, ['label'=>'Nom complet'])
             ->add('genre')
+            ->add('myPositions', null, ['label'=>'Position'])
             ->add('status', null, [
                 'editable' => true, 'label' => 'Actif'
             ])
@@ -236,6 +280,7 @@ final class PersonnelAdmin extends AbstractAdmin
         $show->tab('Personne')
                 ->with('Informations personnelles', ['class' => 'col-md-6'])
                     ->add('fileFromName', 'file', $fileFormOptions)
+                    ->add('myPositions', null, ['label'=>'Position(s)'])
                     ->add('nom', null, ['label' => 'Nom'])
                     ->add('prenoms', null, ['label' => 'Prenoms'])
                     ->add('genre', null, ['label' => 'Genre'])
@@ -322,5 +367,28 @@ final class PersonnelAdmin extends AbstractAdmin
         ));
 
         return true;
+    }
+
+    protected function configureTabMenu(ItemInterface $menu, string $action, ?AdminInterface $childAdmin = null): void
+    {
+        if (!$childAdmin && !in_array($action, ['edit', 'show'])) {
+            return;
+        }
+
+        $admin = $this->isChild() ? $this->getParent() : $this;
+        $id = $admin->getRequest()->get('id');
+
+        $menu->addChild('Voir', $admin->generateMenuUrl('show', ['id' => $id]));
+
+        if ($this->isGranted('EDIT')) {
+            $menu->addChild('Modifier', $admin->generateMenuUrl('edit', ['id' => $id]));
+        }
+
+        if ($this->isGranted('LIST')) {
+            $menu->addChild('Positions', $admin->generateMenuUrl('admin.personnel_position.list', ['id' => $id]));
+            $menu->addChild('Diplome', $admin->generateMenuUrl('admin.diplome.list', ['id' => $id]));
+            $menu->addChild('Certificat Aptitude ', $admin->generateMenuUrl('admin.aptitude.list', ['id' => $id]));
+            $menu->addChild('Assurance', $admin->generateMenuUrl('admin.insurance.list', ['id' => $id]));
+        }
     }
 }

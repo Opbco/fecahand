@@ -5,29 +5,7 @@ namespace App\Entity;
 use App\Repository\LeagueRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\ORM\Mapping\MappedSuperclass;
 use Symfony\Component\Validator\Constraints as Assert;
-
-#[MappedSuperclass]
-class ItemBureau
-{
-
-    #[ORM\OneToOne(inversedBy: 'item', cascade: ['persist', 'remove'])]
-    private ?Bureau $bureau = null;
-
-    public function getBureau(): ?Bureau
-    {
-        return $this->bureau;
-    }
-
-    public function setBureau(?Bureau $bureau): self
-    {
-        $this->bureau = $bureau;
-
-        return $this;
-    }
-
-}
 
 #[ORM\Entity(repositoryClass: LeagueRepository::class)]
 class League extends ItemBureau

@@ -2,6 +2,7 @@
 
 namespace App\Admin;
 
+use App\Entity\CertificatAptitude;
 use App\Entity\Diplome;
 use App\Entity\Personnel;
 use Sonata\AdminBundle\Admin\AbstractAdmin;
@@ -11,84 +12,56 @@ use Sonata\AdminBundle\Datagrid\ListMapper;
 use Sonata\AdminBundle\Form\FormMapper;
 use Sonata\AdminBundle\Form\Type\ModelAutocompleteType;
 use Sonata\AdminBundle\Form\Type\ModelListType;
-use Sonata\AdminBundle\Form\Type\ModelType;
 use Sonata\AdminBundle\Route\RouteCollectionInterface;
 use Sonata\AdminBundle\Show\ShowMapper;
 use Sonata\DoctrineORMAdminBundle\Filter\DateTimeFilter;
 use Sonata\DoctrineORMAdminBundle\Filter\ModelFilter;
+use Sonata\Form\Type\BooleanType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Sonata\Form\Validator\ErrorElement;
 use Sonata\Form\Type\DatePickerType;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 
-final class DiplomeAdmin extends AbstractAdmin
+final class CertificatAptitudeAdmin extends AbstractAdmin
 {
-    private $container;
-
-    public function __construct(ContainerInterface $containerInterface)
-    {
-        $this->container = $containerInterface;
-    }
 
     public function toString(object $object): string
     {
-        return $object instanceof Diplome
-            ? 'Diplome ' . $object->getNom().' '.$object->getInstitution()
-            : 'Diplome'; // shown in the breadcrumb on the create view
-    }
-
-    protected function prePersist(object $object): void
-    {
-        $fileUploader = $this->container->get('App\Service\FileUploader');
-        if ($object->getPdfFile()) {
-            $object->setPdfNom($fileUploader->upload($object->getPdfFile(), 2));
-        }
-    }
-
-    protected function preUpdate(object $object): void
-    {
-        $this->prePersist($object);
+        return $object instanceof CertificatAptitude
+            ? 'Certificat Aptitude' . $object->getId()
+            : 'Certificat Aptitude'; // shown in the breadcrumb on the create view
     }
 
     public function validate(ErrorElement $errorElement, $object)
     {
         $errorElement
-            ->with('nom')
-            ->assertNotBlank()
-            ->assertNotNull()
+            ->with('deliveryDate')
+                ->assertDate()
+                ->assertNotNull()
+            ->end()
+            ->with('deliveryBy')
+                ->assertNotBlank()
+                ->assertNotNull()
             ->end();
     }
 
     protected function configureFormFields(FormMapper $form): void
     {
 
-        $diplome = $this->getSubject();
-
-        // use $fileFormOptions so we can add other options to the field
-        $fileFormFOptions = ['required' => false];
-
-        if ($diplome && ($webPath = $diplome->getPdfAbsolutePath())) {
-            // get the request so the full path to the image can be set
-            $request = $this->getRequest();
-            $fullPath = $diplome->getPdfAbsolutePath();
-            // add a 'help' option containing the preview's img tag
-            $fileFormFOptions['help'] = is_file($fullPath) ? '<a href="' . $webPath . '">Click to download</a>' : 'copie mumerique non disponible';
-            $fileFormFOptions['help_html'] = true;
-        }
-
-        $form->tab('Diplome')
+        $form->tab("Certificat d'aptitude")
                 ->with("Details", ['class' => 'col-md-8'])
-                    ->add('nom', TextType::class, array('label' => 'Nom du diplome', 'required' => true))
                     ->add('deliveryDate', DatePickerType::class, array('label' => 'Delivre le', 'required' => true))
-                    ->add('institution', TextType::class, array('label' => 'Delivre par', 'required' => true))
-                    ->add('personne', ModelListType::class, [
-                        'class' => Personnel::class,
-                        'label' => "Personne concerne",
-                        'btn_delete' => false,
-                        ])
-                    ->add('pdfFile', FileType::class, $fileFormFOptions)
+                    ->add('deliveryBy', TextType::class, array('label' => 'Delivre par', 'required' => true))
+                    ->add('deliveryAt', TextType::class, array('label' => 'Delivre a', 'required' => true))
+                    ->add('remarks', TextareaType::class, array('label' => 'Remarques', 'required' => true))
+                    ->add('personne', ModelAutocompleteType::class, [
+                        'property' => 'nom',
+                        'to_string_callback' => function($entity, $property) {
+                            return $entity->getFullName();
+                        },
+                    ])
                 ->end()
             ->end();
     }
@@ -97,11 +70,10 @@ final class DiplomeAdmin extends AbstractAdmin
     {
         $list->addIdentifier('id', null, ['label'=>'ID'])
             ->add('personne.fullName', null, ['label'=>'Nom du concerne'])
-            ->add('nom', null, ['label'=>'Nom du diplome'])
-            ->add('deliveryDate', null, ['label'=>'Date de delivrance'])
-            ->add('institution', null, [
-                'editable' => true, 'label' => 'Institution'
-            ])
+            ->add('deliveryBy', null, ['label'=>'Delivre Par'])
+            ->add('deliveryDate', null, ['label'=>'Delivre le'])
+            ->add('deliveryAt', null, ['label' => 'Delivre a'])
+            ->add('isValid', null, ['label' => 'Valide'])
             ->add(ListMapper::NAME_ACTIONS, null, [
                 'actions' => [
                     'show' => [],
@@ -118,13 +90,13 @@ final class DiplomeAdmin extends AbstractAdmin
     protected function configureShowFields(ShowMapper $show): void
     {
 
-        $show->tab('Diplome')
+        $show->tab("Certificat d'aptitude")
                 ->with("Details", ['class' => 'col-md-8'])
+                    ->add('deliveryDate', null, array('label' => 'Delivre le', 'required' => true))
+                    ->add('deliveryBy', null, array('label' => 'Delivre par', 'required' => true))
+                    ->add('deliveryAt', null, array('label' => 'Delivre a', 'required' => true))
+                    ->add('remarks', null, array('label' => 'Remarques', 'required' => true))
                     ->add('personne', null, array('label' => 'Personne'))
-                    ->add('nom', null, array('label' => 'Numero'))
-                    ->add('deliveryDate', null, array('label' => 'Delivre le'))
-                    ->add('institution',null, array('label' => 'Institution')) 
-                    ->add('pdfFileFromName', 'file', ['label'=>'Copie electronique'])
                 ->end()
             ->end();
     }
@@ -143,8 +115,8 @@ final class DiplomeAdmin extends AbstractAdmin
 
     protected function configureDatagridFilters(DatagridMapper $datagrid): void
     {
-        $datagrid->add('nom', null, array('label' => 'Nom du diplome'))
-            ->add('institution', null, array('label' => 'Institution'))
+        $datagrid->add('deliveryBy', null, array('label' => 'Delivre par'))
+            ->add('deliveryAt', null, array('label' => 'Delivre a'))
             ->add('deliveryDate', DateTimeFilter::class, array('label' => 'Date de delivrance'))
             ->add('personne', ModelFilter::class, [
                 'field_type' => ModelAutocompleteType::class,

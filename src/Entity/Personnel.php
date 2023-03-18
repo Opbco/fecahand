@@ -129,11 +129,20 @@ class Personnel
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $cniScanFileName = null;
 
-    #[ORM\OneToMany(mappedBy: 'personne', targetEntity: CertificatAptitude::class, orphanRemoval: true)]
+    #[ORM\OneToMany(mappedBy: 'personne', targetEntity: CertificatAptitude::class, orphanRemoval: true, cascade: ['persist', 'remove'])]
     private Collection $certificatAptitudes;
 
     #[ORM\OneToMany(mappedBy: 'personne', targetEntity: Diplome::class, orphanRemoval: true, cascade: ['persist', 'remove'])]
     private Collection $diplomes;
+
+    #[ORM\OneToMany(mappedBy: 'personnel', targetEntity: PersonnelPosition::class, orphanRemoval: true, cascade: ['persist', 'remove'])]
+    private Collection $personnelPositions;
+
+
+    public function __toString()
+    {
+        return $this->getFullName();
+    }
 
     public function __construct()
     {
@@ -142,6 +151,7 @@ class Personnel
         $this->insurances = new ArrayCollection();
         $this->certificatAptitudes = new ArrayCollection();
         $this->diplomes = new ArrayCollection();
+        $this->personnelPositions = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -687,4 +697,43 @@ class Personnel
 
         return $this;
     }
+
+    public function getMyPositions(){
+        $result = [];
+        foreach ($this->personnelPositions as $personnePosition) {
+            $result[] = $personnePosition->getPosition()->__toString();
+        }
+        return join(', ', $result);
+    }
+
+    /**
+     * @return Collection<int, PersonnelPosition>
+     */
+    public function getPersonnelPositions(): Collection
+    {
+        return $this->personnelPositions;
+    }
+
+    public function addPersonnelPosition(PersonnelPosition $personnelPosition): self
+    {
+        if (!$this->personnelPositions->contains($personnelPosition)) {
+            $this->personnelPositions->add($personnelPosition);
+            $personnelPosition->setPersonnel($this);
+        }
+
+        return $this;
+    }
+
+    public function removePersonnelPosition(PersonnelPosition $personnelPosition): self
+    {
+        if ($this->personnelPositions->removeElement($personnelPosition)) {
+            // set the owning side to null (unless already changed)
+            if ($personnelPosition->getPersonnel() === $this) {
+                $personnelPosition->setPersonnel(null);
+            }
+        }
+
+        return $this;
+    }
+
 }

@@ -5,10 +5,13 @@ namespace App\Entity;
 use App\Repository\CertificatAptitudeRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use phpDocumentor\Reflection\Types\Boolean;
 
 #[ORM\Entity(repositoryClass: CertificatAptitudeRepository::class)]
 class CertificatAptitude
 {
+    const VALIDITY = 2;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -93,5 +96,13 @@ class CertificatAptitude
         $this->personne = $personne;
 
         return $this;
+    }
+
+    public function isValid(): bool
+    {
+        $dateNow = new \DateTime();
+        $interval = date_diff($dateNow, $this->deliveryDate);
+  
+      return $interval->y < $this::VALIDITY;
     }
 }

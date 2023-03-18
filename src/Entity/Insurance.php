@@ -15,7 +15,7 @@ class Insurance
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(type: Types::SMALLINT)]
+    #[ORM\Column(type: Types::SMALLINT, options:['default' => 1])]
     private ?int $status = null;
 
     #[ORM\Column(length: 255)]
@@ -27,11 +27,9 @@ class Insurance
     private ?string $typeAssurance = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
-    #[Assert\DateTime]
     private ?\DateTimeInterface $dateDelivrance = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
-    #[Assert\DateTime]
     private ?\DateTimeInterface $dateExpiration = null;
 
     #[ORM\Column(length: 255)]
@@ -47,7 +45,6 @@ class Insurance
     private ?User $userCreated = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, options:['default' => 'CURRENT_TIMESTAMP'])]
-    #[Assert\DateTime]
     private ?\DateTimeInterface $dateCreated = null;
 
     #[ORM\ManyToOne(inversedBy: 'insurances')]
@@ -177,5 +174,20 @@ class Insurance
         $this->personnel = $personnel;
 
         return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function setTypeAssMul($typeAss)
+    {
+        $this->setTypeAssurance(implode(', ', $typeAss));
+        return $this;
+    }
+
+    public function getTypeAssMul()
+    {
+        return explode(', ', $this->getTypeAssurance());
+
     }
 }

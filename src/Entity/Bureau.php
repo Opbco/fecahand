@@ -131,4 +131,18 @@ class Bureau
 
         return $this;
     }
+
+    public function setPositions(Collection $positions): void
+    {
+        $this->positions = new ArrayCollection;
+
+        foreach ($positions as $one) {
+            $this->addPosition($one);
+        }
+    }
+
+    public function __toString()
+    {
+        return $this->getNom();
+    }
 }

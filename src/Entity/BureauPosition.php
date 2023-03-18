@@ -21,7 +21,7 @@ class BureauPosition
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(type: Types::SMALLINT)]
+    #[ORM\Column(type: Types::SMALLINT, options:['default'=>1])]
     #[Assert\Positive]
     private ?int $nombre = null;
 
@@ -72,5 +72,13 @@ class BureauPosition
         $this->bureau = $bureau;
 
         return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return (string) $this->getPosition();
     }
 }

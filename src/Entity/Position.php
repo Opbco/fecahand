@@ -5,9 +5,12 @@ namespace App\Entity;
 use App\Repository\PositionRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: PositionRepository::class)]
+#[UniqueEntity('nom')]
 class Position
 {
     #[ORM\Id]
@@ -15,10 +18,8 @@ class Position
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $status = null;
-
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, unique:true)]
+    #[Assert\NotBlank]
     private ?string $nom = null;
 
     #[ORM\Column]
@@ -36,26 +37,18 @@ class Position
     #[ORM\OneToMany(mappedBy: 'position', targetEntity: BureauPosition::class, orphanRemoval: true)]
     private Collection $bureaux;
 
+    #[ORM\OneToMany(mappedBy: 'position', targetEntity: PersonnelPosition::class, orphanRemoval: true)]
+    private Collection $positionPersonnels;
+
     public function __construct()
     {
         $this->bureaux = new ArrayCollection();
+        $this->positionPersonnels = new ArrayCollection();
     }
 
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getStatus(): ?string
-    {
-        return $this->status;
-    }
-
-    public function setStatus(string $status): self
-    {
-        $this->status = $status;
-
-        return $this;
     }
 
     public function getNom(): ?string
@@ -147,4 +140,26 @@ class Position
 
         return $this;
     }
+
+    public function __toString()
+    {
+        return $this->getNom();
+    }
+
+    /**
+     * @return Collection<int, PersonnelPosition>
+     */
+    public function getPositionPersonnels(): Collection
+    {
+        return $this->positionPersonnels;
+    }
+
+    /**
+     * @param Collection|PersonnelPosition[] $positionPersonnels
+     */
+    public function setPositionPersonnels(Collection $positionPersonnels)
+    {
+        $this->positionPersonnels = $positionPersonnels;
+    }
+
 }
