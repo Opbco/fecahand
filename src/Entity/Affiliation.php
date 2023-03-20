@@ -3,24 +3,22 @@
 namespace App\Entity;
 
 use App\Repository\AffiliationRepository;
+use App\Entity\Status;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: AffiliationRepository::class)]
-class Affiliation
+class Affiliation extends Status
 {
+    
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(type: Types::SMALLINT)]
-    #[Assert\Positive]
-    private ?int $status = null;
-
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[Assert\DateTime]
+    #[Assert\Type('dateTime')]
     private ?\DateTimeInterface $dateAffiliation = null;
 
     #[ORM\ManyToOne]
@@ -32,11 +30,11 @@ class Affiliation
     private ?User $userUpdated = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, options:['default' => 'CURRENT_TIMESTAMP'])]
-    #[Assert\DateTime]
+    #[Assert\Type('dateTime')]
     private ?\DateTimeInterface $dateCreated = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, options:['default' => 'CURRENT_TIMESTAMP'])]
-    #[Assert\DateTime]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable:true, options:['default' => 'CURRENT_TIMESTAMP'])]
+    #[Assert\Type('dateTime')]
     private ?\DateTimeInterface $dateUpdated = null;
 
     #[ORM\ManyToOne(inversedBy: 'affiliations')]
@@ -46,18 +44,6 @@ class Affiliation
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getStatus(): ?int
-    {
-        return $this->status;
-    }
-
-    public function setStatus(int $status): self
-    {
-        $this->status = $status;
-
-        return $this;
     }
 
     public function getDateAffiliation(): ?\DateTimeInterface

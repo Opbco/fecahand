@@ -7,11 +7,14 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Oh\GoogleMapFormTypeBundle\Traits\LocationTrait;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ClubRepository::class)]
 class Club extends ItemBureau
 {
+    use LocationTrait;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -22,13 +25,10 @@ class Club extends ItemBureau
     private ?string $nom = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
-    #[Assert\DateTime]
+    #[Assert\Type('datetime')]
     private ?\DateTimeInterface $dateCreation = null;
 
-    #[ORM\Column]
-    private array $localisation = [];
-
-    #[ORM\Column(type: Types::ARRAY)]
+    #[ORM\Column(type: Types::JSON)]
     private array $couleurs = [];
 
     #[ORM\Column(length: 255)]
@@ -39,18 +39,18 @@ class Club extends ItemBureau
     private ?string $numeroMinat = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
-    #[Assert\DateTime]
+    #[Assert\Type('datetime')]
     private ?\DateTimeInterface $datePublication = null;
 
-    #[ORM\Column(type: Types::SMALLINT)]
+    #[ORM\Column(type: Types::SMALLINT, nullable:true)]
     private ?int $status = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[Assert\DateTime]
+    #[Assert\Type('datetime')]
     private ?\DateTimeInterface $dateCreated = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[Assert\DateTime]
+    #[Assert\Type('datetime')]
     private ?\DateTimeInterface $dateUpdated = null;
 
     #[ORM\ManyToOne]
@@ -61,16 +61,20 @@ class Club extends ItemBureau
     #[ORM\JoinColumn(nullable: false)]
     private ?User $userUpdated = null;
 
-    #[ORM\OneToMany(mappedBy: 'club', targetEntity: Affiliation::class, orphanRemoval: true)]
+    #[ORM\OneToMany(mappedBy: 'club', targetEntity: Affiliation::class, orphanRemoval: true, cascade: ['persist', 'remove'])]
     private Collection $affiliations;
 
-    #[ORM\ManyToMany(targetEntity: Stade::class, inversedBy: 'clubs')]
+    #[ORM\OneToMany(mappedBy: 'club', targetEntity: ClubStade::class, orphanRemoval: true, cascade: ['persist', 'remove'])]
     private Collection $stades;
+
+    #[ORM\OneToMany(mappedBy: 'club', targetEntity: Contrat::class, orphanRemoval: true)]
+    private Collection $contrats;
 
     public function __construct()
     {
         $this->affiliations = new ArrayCollection();
         $this->stades = new ArrayCollection();
+        $this->contrats = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -98,18 +102,6 @@ class Club extends ItemBureau
     public function setDateCreation(\DateTimeInterface $dateCreation): self
     {
         $this->dateCreation = $dateCreation;
-
-        return $this;
-    }
-
-    public function getLocalisation(): array
-    {
-        return $this->localisation;
-    }
-
-    public function setLocalisation(array $localisation): self
-    {
-        $this->localisation = $localisation;
 
         return $this;
     }
@@ -252,26 +244,67 @@ class Club extends ItemBureau
         return $this;
     }
 
+    public function __toString()
+    {
+        return $this->getNom();
+    }
+
     /**
-     * @return Collection<int, Stade>
+     * @return Collection<int, CludStade>
      */
-    public function getStades(): Collection
+    public function getStade(): Collection
     {
         return $this->stades;
     }
 
-    public function addStade(Stade $stade): self
+    public function addStade(ClubStade $stade): self
     {
         if (!$this->stades->contains($stade)) {
             $this->stades->add($stade);
+            $stade->setClub($this);
         }
 
         return $this;
     }
 
-    public function removeStade(Stade $stade): self
+    public function removeStade(ClubStade $stade): self
     {
-        $this->stades->removeElement($stade);
+        if ($this->stades->removeElement($stade)) {
+            // set the owning side to null (unless already changed)
+            if ($stade->getClub() === $this) {
+                $stade->setClub(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Contrat>
+     */
+    public function getContrats(): Collection
+    {
+        return $this->contrats;
+    }
+
+    public function addContrat(Contrat $contrat): self
+    {
+        if (!$this->contrats->contains($contrat)) {
+            $this->contrats->add($contrat);
+            $contrat->setClub($this);
+        }
+
+        return $this;
+    }
+
+    public function removeContrat(Contrat $contrat): self
+    {
+        if ($this->contrats->removeElement($contrat)) {
+            // set the owning side to null (unless already changed)
+            if ($contrat->getClub() === $this) {
+                $contrat->setClub(null);
+            }
+        }
 
         return $this;
     }

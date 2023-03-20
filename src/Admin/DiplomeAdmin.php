@@ -11,12 +11,10 @@ use Sonata\AdminBundle\Datagrid\ListMapper;
 use Sonata\AdminBundle\Form\FormMapper;
 use Sonata\AdminBundle\Form\Type\ModelAutocompleteType;
 use Sonata\AdminBundle\Form\Type\ModelListType;
-use Sonata\AdminBundle\Form\Type\ModelType;
 use Sonata\AdminBundle\Route\RouteCollectionInterface;
 use Sonata\AdminBundle\Show\ShowMapper;
 use Sonata\DoctrineORMAdminBundle\Filter\DateTimeFilter;
 use Sonata\DoctrineORMAdminBundle\Filter\ModelFilter;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Sonata\Form\Validator\ErrorElement;
 use Sonata\Form\Type\DatePickerType;
@@ -69,7 +67,7 @@ final class DiplomeAdmin extends AbstractAdmin
         // use $fileFormOptions so we can add other options to the field
         $fileFormFOptions = ['required' => false];
 
-        if ($diplome && ($webPath = $diplome->getPdfAbsolutePath())) {
+        if ($diplome && ($webPath = $diplome->getPdfWebPath())) {
             // get the request so the full path to the image can be set
             $request = $this->getRequest();
             $fullPath = $diplome->getPdfAbsolutePath();

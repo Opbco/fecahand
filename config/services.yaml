@@ -47,13 +47,39 @@ services:
         tags:
             - { name: sonata.admin, model_class: App\Entity\Departement, manager_type: orm, group: Localisation, label: Departement }
 
+    admin.club:
+        class: App\Admin\ClubAdmin
+        tags:
+            - { name: sonata.admin, model_class: App\Entity\Club, group: Clubs, icon: 'fab fa-artstation',  manager_type: orm, label: Clubs }
+        calls:
+            - [addChild, ['@admin.clubstade', 'club']]
+            - [addChild, ['@admin.affiliation', 'club']]
+            - [setTranslationDomain, ['App']]
+    
+    admin.clubstade:
+        class: App\Admin\ClubStadeAdmin
+        calls:
+            - [setTranslationDomain, ['App']]
+        tags:
+            - { name: sonata.admin, model_class: App\Entity\ClubStade, manager_type: orm, group: Clubs, label: Clubs et Stades }
+
+    
     admin.stade:
         class: App\Admin\StadeAdmin
         calls:
             - [setTranslationDomain, ['App']]
         tags:
-            - { name: sonata.admin, model_class: App\Entity\Stade, manager_type: orm, group: Clubs, icon: 'fab fa-artstation', label: Stades }
+            - { name: sonata.admin, model_class: App\Entity\Stade, manager_type: orm, group: Clubs, label: Stades }
 
+    admin.affiliation:
+        class: App\Admin\AffiliationAdmin
+        calls:
+            - [setTranslationDomain, ['App']]
+        tags:
+            - { name: sonata.admin, model_class: App\Entity\Affiliation, manager_type: orm, group: Clubs, label: Affiliations }
+
+    
+    
 
     admin.personnel:
         class: App\Admin\PersonnelAdmin
@@ -64,7 +90,15 @@ services:
             - [addChild, ['@admin.diplome', 'personne']]
             - [addChild, ['@admin.aptitude', 'personne']]
             - [addChild, ['@admin.insurance', 'personnel']]
+            - [addChild, ['@admin.contrat', 'personnel']]
             - [setTranslationDomain, ['App']]
+
+    admin.contrat:
+        class: App\Admin\ContratAdmin
+        calls:
+            - [setTranslationDomain, ['App']]
+        tags:
+            - { name: sonata.admin, model_class: App\Entity\Contrat, manager_type: orm, group: Acteurs, label: Contrat }
 
     admin.diplome:
         class: App\Admin\DiplomeAdmin

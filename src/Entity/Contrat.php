@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\ContratRepository;
+use App\Trait\PdfTrait;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -10,17 +11,20 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: ContratRepository::class)]
 class Contrat
 {
+
+    use PdfTrait;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
-    #[Assert\DateTime]
+    #[Assert\Type('datetime')]
     private ?\DateTimeInterface $dateSignature = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
-    #[Assert\DateTime]
+    #[Assert\Type('datetime')]
     private ?\DateTimeInterface $dateFin = null;
 
     #[ORM\Column(type: 'boolean', nullable: false, options: ['default' => 0])]
@@ -28,7 +32,7 @@ class Contrat
     private ?bool $renouvellable = null;
 
     #[ORM\Column]
-    #[Assert\Currency]
+    #[Assert\Positive]
     private ?float $salaire = null;
 
     #[ORM\ManyToOne]
@@ -36,20 +40,24 @@ class Contrat
     private ?User $userCreated = null;
 
     #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     private ?User $userUpdated = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, options:['default' => 'CURRENT_TIMESTAMP'])]
-    #[Assert\DateTime]
+    #[Assert\Type('datetime')]
     private ?\DateTimeInterface $dateCreated = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, options:['default' => 'CURRENT_TIMESTAMP'])]
-    #[Assert\DateTime]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable:true, options:['default' => 'CURRENT_TIMESTAMP'])]
+    #[Assert\Type('datetime')]
     private ?\DateTimeInterface $dateUpdated = null;
 
     #[ORM\ManyToOne(inversedBy: 'contrats')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Personnel $personnel = null;
+
+    #[ORM\ManyToOne(inversedBy: 'contrats')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Club $club = null;
 
     public function getId(): ?int
     {
@@ -160,6 +168,18 @@ class Contrat
     public function setPersonnel(?Personnel $personnel): self
     {
         $this->personnel = $personnel;
+
+        return $this;
+    }
+
+    public function getClub(): ?Club
+    {
+        return $this->club;
+    }
+
+    public function setClub(?Club $club): self
+    {
+        $this->club = $club;
 
         return $this;
     }

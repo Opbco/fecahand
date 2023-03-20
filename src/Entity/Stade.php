@@ -39,7 +39,7 @@ class Stade
     #[ORM\JoinColumn(nullable: false)]
     private ?User $userCreated = null;
 
-    #[ORM\ManyToMany(targetEntity: Club::class, mappedBy: 'stades')]
+    #[ORM\OneToMany(mappedBy: 'stade', targetEntity: ClubStade::class, orphanRemoval: true, cascade: ['persist', 'remove'])]
     private Collection $clubs;
 
     public function __construct()
@@ -124,30 +124,39 @@ class Stade
         return $this;
     }
 
+    public function __toString()
+    {
+        return $this->getNom();
+    }
+
     /**
-     * @return Collection<int, Club>
+     * @return Collection<int, CludStade>
      */
-    public function getClubs(): Collection
+    public function getClub(): Collection
     {
         return $this->clubs;
     }
 
-    public function addClub(Club $club): self
+    public function addClub(ClubStade $club): self
     {
         if (!$this->clubs->contains($club)) {
             $this->clubs->add($club);
-            $club->addStade($this);
+            $club->setStade($this);
         }
 
         return $this;
     }
 
-    public function removeClub(Club $club): self
+    public function removeClub(ClubStade $club): self
     {
         if ($this->clubs->removeElement($club)) {
-            $club->removeStade($this);
+            // set the owning side to null (unless already changed)
+            if ($club->getStade() === $this) {
+                $club->setStade(null);
+            }
         }
 
         return $this;
     }
+
 }

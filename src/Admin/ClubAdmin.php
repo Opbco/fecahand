@@ -3,26 +3,25 @@
 
 namespace App\Admin;
 
-use App\Entity\Stade;
-use App\Form\Type\DimensionType;
+use App\Entity\Club;
+use Knp\Menu\ItemInterface;
 use Oh\GoogleMapFormTypeBundle\Form\Type\GoogleMapType;
 use Sonata\AdminBundle\Admin\AbstractAdmin;
+use Sonata\AdminBundle\Admin\AdminInterface;
 use Sonata\AdminBundle\Datagrid\DatagridInterface;
 use Sonata\AdminBundle\Datagrid\DatagridMapper;
 use Sonata\AdminBundle\Datagrid\ListMapper;
 use Sonata\AdminBundle\FieldDescription\FieldDescriptionInterface;
 use Sonata\AdminBundle\Form\FormMapper;
-use Sonata\AdminBundle\Route\RouteCollectionInterface;
 use Sonata\AdminBundle\Show\ShowMapper;
-use Sonata\DoctrineORMAdminBundle\Filter\StringListFilter;
-use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Sonata\Form\Validator\ErrorElement;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\NumberType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\Extension\Core\Type\ColorType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
-final class StadeAdmin extends AbstractAdmin
+final class ClubAdmin extends AbstractAdmin
 {
     private $ts;
 
@@ -33,20 +32,25 @@ final class StadeAdmin extends AbstractAdmin
 
     public function toString(object $object): string
     {
-        return $object instanceof Stade
+        return $object instanceof Club
             ? $object->getNom()
-            : 'Stade'; // shown in the breadcrumb on the create view
+            : 'Club'; // shown in the breadcrumb on the create view
     }
 
     protected function prePersist(object $object): void
     {
         $user = $this->ts->getToken()->getUser();
+        $object->setDateCreated(new \DateTimeImmutable());
+        $object->setDateUpdated(new \DateTimeImmutable());
+        $object->setUserUpdated($user);
         $object->setUserCreated($user);
     }
 
     protected function preUpdate(object $object): void
     {
-        $this->prePersist($object);
+        $user = $this->ts->getToken()->getUser();
+        $object->setDateUpdated(new \DateTimeImmutable());
+        $object->setUserUpdated($user);
     }
 
     public function validate(ErrorElement $errorElement, $object)
@@ -61,16 +65,23 @@ final class StadeAdmin extends AbstractAdmin
     protected function configureFormFields(FormMapper $form): void
     {
 
-        $form->tab('Details')
+        $form->tab('Club')
                 ->with('Informations', ['class' => 'col-md-6'])
                     ->add('nom', TextType::class)
-                    ->add('dimension', DimensionType::class, ['label'=>'Dimensions'])
-                    ->add('encercle', ChoiceType::class, array('choices'=> [
-                        'Choisir' => '',
-                        'oui' => true,
-                        'non' => false,
-                    ],'label' => 'Est-il encercle?', 'required' => true))
-                    ->add('comment', TextareaType::class, array('label' => 'Commentaire', 'required' => true))
+                    ->add('dateCreation', DateType::class, ['label'=>'Date de creation'])
+                    ->add('couleurs', CollectionType::class, [
+                        'entry_type' => ColorType::class,
+                        'allow_add' => true,
+                        'allow_delete' => true,
+                        'entry_options' => [
+                            'help' => 'Vous pouvez entrez au tant que voulu.',
+                            'html5' => true,
+                        ],
+                        'required' => true
+                    ])
+                    ->add('devise', TextType::class, array('label' => 'Devise', 'required' => true))
+                    ->add('numeroMinat', TextType::class, array('label' => 'Numero MINAT', 'required' => true))
+                    ->add('datePublication', DateType::class, ['label'=>'Date de publication'])
                 ->end()
                 ->with('Localisation', ['class' => 'col-md-6'])
                     ->add('latlng', GoogleMapType::class)
@@ -81,16 +92,11 @@ final class StadeAdmin extends AbstractAdmin
     protected function configureListFields(ListMapper $list): void
     {
         $list->addIdentifier('nom', null, ['label'=>'nom'])
-            ->add('dimension', FieldDescriptionInterface::TYPE_ARRAY, [
-                'inline' => true,
-                'display' => 'both',
-                'key_translation_domain' => true,
-                'value_translation_domain' => null
+            ->add('couleurs', FieldDescriptionInterface::TYPE_ARRAY, [
+                'template' => '@SonataAdmin/CRUD/list_color.html.twig',
             ])
-            ->add('Comment', null, ['label'=>'Position'])
-            ->add('encercle', null, [
-                'editable' => true, 'label' => 'Est-il encercle?'
-            ])
+            ->add('devise', null, ['label'=>'Devise'])
+            ->add('dateCreation', null, ['label'=>'Devise'])
             ->add(ListMapper::NAME_ACTIONS, null, [
                 'actions' => [
                     'show' => [],
@@ -110,9 +116,11 @@ final class StadeAdmin extends AbstractAdmin
         $show->tab('Stade')
                 ->with('Informations', ['class' => 'col-md-6'])
                     ->add('nom', null, ['label' => 'Nom'])
-                    ->add('dimension', null, ['label' => 'Dimensions (m) '])
-                    ->add('encercle', null, ['label' => 'Encercle'])
-                    ->add('comment', null, ['label' => 'Commentaire'])
+                    ->add('dateCreation', null, ['label'=>'Date de creation'])
+                    ->add('couleurs')
+                    ->add('devise', null, array('label' => 'Devise'))
+                    ->add('numeroMinat', null, array('label' => 'Numero MINAT'))
+                    ->add('datePublication',null, ['label'=>'Date de publication'])
                 ->end()
                 ->with('Localisation', ['class' => 'col-md-6'])
                     ->add('address', null, ['label' => 'Adresse'])
@@ -138,10 +146,28 @@ final class StadeAdmin extends AbstractAdmin
    protected function configureDatagridFilters(DatagridMapper $datagrid): void
     {
         $datagrid->add('nom', null, array('label' => 'Nom'))
-        ->add('encercle', null, array('label' => 'Est-il encercle?'))
-        ->add('dimension', StringListFilter::class, [
-            'field_type' => DimensionType::class,
-        ])
+        ->add('dateCreation', null, array('label' => 'date de creation'))
         ->add('address', null, array('label' => 'Adresse'));
+    }
+
+    protected function configureTabMenu(ItemInterface $menu, string $action, ?AdminInterface $childAdmin = null): void
+    {
+        if (!$childAdmin && !in_array($action, ['edit', 'show'])) {
+            return;
+        }
+
+        $admin = $this->isChild() ? $this->getParent() : $this;
+        $id = $admin->getRequest()->get('id');
+
+        $menu->addChild('Voir', $admin->generateMenuUrl('show', ['id' => $id]));
+
+        if ($this->isGranted('EDIT')) {
+            $menu->addChild('Modifier', $admin->generateMenuUrl('edit', ['id' => $id]));
+        }
+
+        if ($this->isGranted('LIST')) {
+            $menu->addChild('Stades', $admin->generateMenuUrl('admin.clubstade.list', ['id' => $id]));
+            $menu->addChild('Affiliation', $admin->generateMenuUrl('admin.affiliation.list', ['id' => $id]));
+        }
     }
 }
