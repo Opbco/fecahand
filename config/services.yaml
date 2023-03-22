@@ -79,7 +79,21 @@ services:
             - { name: sonata.admin, model_class: App\Entity\Affiliation, manager_type: orm, group: Clubs, label: Affiliations }
 
     
-    
+    admin.discipline:
+        class: App\Admin\DisciplineAffinitaireAdmin
+        calls:
+            - [setTranslationDomain, ['App']]
+            - [addChild, ['@admin.discipline_regles', 'discipline']]
+        tags:
+            - { name: sonata.admin, model_class: App\Entity\DisciplineAffinitaire, manager_type: orm, icon: 'fas fa-passport', group: Discipline Affinitaire, label: Disciplines }
+
+    admin.regle:
+        class: App\Admin\RegleAdmin
+        calls:
+            - [setTranslationDomain, ['App']]
+        tags:
+            - { name: sonata.admin, model_class: App\Entity\Regle, manager_type: orm, group: Discipline Affinitaire, label: Regles }
+
 
     admin.personnel:
         class: App\Admin\PersonnelAdmin
@@ -134,3 +148,10 @@ services:
             - [setTranslationDomain, ['App']]
         tags:
             - { name: sonata.admin, model_class: App\Entity\PersonnelPosition, manager_type: orm, group: Acteurs, label: Personnes et Position }
+    
+    admin.discipline_regles:
+        class: App\Admin\DisciplineReglesAdmin
+        calls:
+            - [setTranslationDomain, ['App']]
+        tags:
+            - { name: sonata.admin, model_class: App\Entity\DisciplineRegles, manager_type: orm, group: Discipline Affinitaire, label: Disciplines et regles }

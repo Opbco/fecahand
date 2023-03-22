@@ -53,15 +53,15 @@ class DisciplineAffinitaire extends ItemBureau
     private ?int $dureeMandatSec = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, options:['default' => 'CURRENT_TIMESTAMP'])]
-    #[Assert\DateTime]
+    #[Assert\Type('dateTime')]
     private ?\DateTimeInterface $dateCreated = null;
 
-    #[ORM\ManyToMany(targetEntity: Regle::class, mappedBy: 'disciplines')]
-    private Collection $regles;
+    #[ORM\OneToMany(mappedBy: 'discipline', targetEntity: DisciplineRegles::class, orphanRemoval: true)]
+    private Collection $disciplineRegles;
 
     public function __construct()
     {
-        $this->regles = new ArrayCollection();
+        $this->disciplineRegles = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -178,29 +178,37 @@ class DisciplineAffinitaire extends ItemBureau
     }
 
     /**
-     * @return Collection<int, Regle>
+     * @return Collection<int, DisciplineRegles>
      */
-    public function getRegles(): Collection
+    public function getDisciplineRegles(): Collection
     {
-        return $this->regles;
+        return $this->disciplineRegles;
     }
 
-    public function addRegle(Regle $regle): self
+    public function addDisciplineRegle(DisciplineRegles $disciplineRegle): self
     {
-        if (!$this->regles->contains($regle)) {
-            $this->regles->add($regle);
-            $regle->addDiscipline($this);
+        if (!$this->disciplineRegles->contains($disciplineRegle)) {
+            $this->disciplineRegles->add($disciplineRegle);
+            $disciplineRegle->setDiscipline($this);
         }
 
         return $this;
     }
 
-    public function removeRegle(Regle $regle): self
+    public function removeDisciplineRegle(DisciplineRegles $disciplineRegle): self
     {
-        if ($this->regles->removeElement($regle)) {
-            $regle->removeDiscipline($this);
+        if ($this->disciplineRegles->removeElement($disciplineRegle)) {
+            // set the owning side to null (unless already changed)
+            if ($disciplineRegle->getDiscipline() === $this) {
+                $disciplineRegle->setDiscipline(null);
+            }
         }
 
         return $this;
+    }
+
+    public function __toString()
+    {
+        return $this->getNom();
     }
 }

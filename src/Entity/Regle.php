@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\RegleRepository;
+use App\Trait\PdfTrait;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -11,6 +12,8 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: RegleRepository::class)]
 class Regle
 {
+    use PdfTrait; 
+    
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -21,9 +24,6 @@ class Regle
 
     #[ORM\Column(length: 255)]
     private ?string $description = null;
-
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $documentNomFichier = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTimeInterface $datePromulgation = null;
@@ -38,12 +38,12 @@ class Regle
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTimeInterface $dateCreated = null;
 
-    #[ORM\ManyToMany(targetEntity: DisciplineAffinitaire::class, inversedBy: 'regles')]
-    private Collection $disciplines;
+    #[ORM\OneToMany(mappedBy: 'regle', targetEntity: DisciplineRegles::class, orphanRemoval: true)]
+    private Collection $disciplineRegles;
 
     public function __construct()
     {
-        $this->disciplines = new ArrayCollection();
+        $this->disciplineRegles = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -71,18 +71,6 @@ class Regle
     public function setDescription(string $description): self
     {
         $this->description = $description;
-
-        return $this;
-    }
-
-    public function getDocumentNomFichier(): ?string
-    {
-        return $this->documentNomFichier;
-    }
-
-    public function setDocumentNomFichier(?string $documentNomFichier): self
-    {
-        $this->documentNomFichier = $documentNomFichier;
 
         return $this;
     }
@@ -136,26 +124,37 @@ class Regle
     }
 
     /**
-     * @return Collection<int, DisciplineAffinitaire>
+     * @return Collection<int, DisciplineRegles>
      */
-    public function getDisciplines(): Collection
+    public function getDisciplineRegles(): Collection
     {
-        return $this->disciplines;
+        return $this->disciplineRegles;
     }
 
-    public function addDiscipline(DisciplineAffinitaire $discipline): self
+    public function addDisciplineRegle(DisciplineRegles $disciplineRegle): self
     {
-        if (!$this->disciplines->contains($discipline)) {
-            $this->disciplines->add($discipline);
+        if (!$this->disciplineRegles->contains($disciplineRegle)) {
+            $this->disciplineRegles->add($disciplineRegle);
+            $disciplineRegle->setRegle($this);
         }
 
         return $this;
     }
 
-    public function removeDiscipline(DisciplineAffinitaire $discipline): self
+    public function removeDisciplineRegle(DisciplineRegles $disciplineRegle): self
     {
-        $this->disciplines->removeElement($discipline);
+        if ($this->disciplineRegles->removeElement($disciplineRegle)) {
+            // set the owning side to null (unless already changed)
+            if ($disciplineRegle->getRegle() === $this) {
+                $disciplineRegle->setRegle(null);
+            }
+        }
 
         return $this;
+    }
+
+    public function __toString()
+    {
+        return $this->getNom();
     }
 }

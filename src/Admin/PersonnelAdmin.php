@@ -117,16 +117,12 @@ final class PersonnelAdmin extends AbstractAdmin
             ->add('imageFile', FileType::class, $fileFormOptions)
             ->add('nom', TextType::class)
             ->add('prenoms', TextType::class)
-            ->add('genre', ChoiceFieldMaskType::class, [
+            ->add('genre', ChoiceType::class, [
                 'choices' => [
                     'Masculin' => 'Masculin',
                     'Feminin' => 'Feminin',
                 ],
-                'map' => [
-                    'Masculin' => ['Masculin'],
-                    'Feminin' => ['Feminin'],
-                ],
-                'placeholder' => 'Choose the gender',
+                'label' => 'Choose the gender',
                 'required' => true
             ])
             ->add('dateNaiss', DatePickerType::class, [
