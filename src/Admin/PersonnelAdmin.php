@@ -385,7 +385,6 @@ final class PersonnelAdmin extends AbstractAdmin
             $menu->addChild('Contrats', $admin->generateMenuUrl('admin.contrat.list', ['id' => $id]));
             $menu->addChild('Diplome', $admin->generateMenuUrl('admin.diplome.list', ['id' => $id]));
             $menu->addChild('Certificat Aptitude ', $admin->generateMenuUrl('admin.aptitude.list', ['id' => $id]));
-            $menu->addChild('Assurance', $admin->generateMenuUrl('admin.insurance.list', ['id' => $id]));
         }
     }
 }

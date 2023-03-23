@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\ClubRepository;
+use App\Trait\ImageTrait;
+use App\Trait\PdfTrait;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -13,7 +15,13 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: ClubRepository::class)]
 class Club extends ItemBureau
 {
+    use ImageTrait;
     use LocationTrait;
+    use PdfTrait;
+
+    const GENDER_MALE = 1;
+    const GENDER_FEMALE = 2;
+    const GENDER_MIX = 3;
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -30,6 +38,10 @@ class Club extends ItemBureau
 
     #[ORM\Column(type: Types::JSON)]
     private array $couleurs = [];
+
+    #[ORM\Column(type: Types::SMALLINT)]
+    #[Assert\Positive]
+    private ?int $genre = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\Length(min: 5)]
@@ -70,12 +82,28 @@ class Club extends ItemBureau
     #[ORM\OneToMany(mappedBy: 'club', targetEntity: Contrat::class, orphanRemoval: true)]
     private Collection $contrats;
 
+    #[ORM\OneToMany(mappedBy: 'personnel', targetEntity: Insurance::class, orphanRemoval: true)]
+    private Collection $insurances;
+
     public function __construct()
     {
         $this->affiliations = new ArrayCollection();
         $this->stades = new ArrayCollection();
         $this->contrats = new ArrayCollection();
+        $this->insurances = new ArrayCollection();
     }
+
+    public static $genderCodes = array(
+        "Homme" => Gender::GENDER_MALE,
+        "Femme" => Gender::GENDER_FEMALE,
+        "Mix" => Gender::GENDER_MIX
+    );
+
+    public static $codesGender = array(
+        Gender::GENDER_MALE => "Homme",
+        Gender::GENDER_FEMALE => "Femme",
+        Gender::GENDER_MIX => "Mix"
+    );
 
     public function getId(): ?int
     {
@@ -90,6 +118,27 @@ class Club extends ItemBureau
     public function setNom(string $nom): self
     {
         $this->nom = $nom;
+
+        return $this;
+    }
+
+    public static function getGenreCodes()
+    {
+        return self::$genderCodes;
+    }
+
+    public function getGenre(): ?string
+    {
+        if (!is_null($this->genre)) {
+            return self::$codesGender[$this->genre];
+        } else {
+            return null;
+        }
+    }
+
+    public function setGenre(int $genre): self
+    {
+        $this->genre = intval($genre);
 
         return $this;
     }
@@ -303,6 +352,36 @@ class Club extends ItemBureau
             // set the owning side to null (unless already changed)
             if ($contrat->getClub() === $this) {
                 $contrat->setClub(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Insurance>
+     */
+    public function getInsurances(): Collection
+    {
+        return $this->insurances;
+    }
+
+    public function addInsurance(Insurance $insurance): self
+    {
+        if (!$this->insurances->contains($insurance)) {
+            $this->insurances->add($insurance);
+            $insurance->setClub($this);
+        }
+
+        return $this;
+    }
+
+    public function removeInsurance(Insurance $insurance): self
+    {
+        if ($this->insurances->removeElement($insurance)) {
+            // set the owning side to null (unless already changed)
+            if ($insurance->getClub() === $this) {
+                $insurance->setClub(null);
             }
         }
 

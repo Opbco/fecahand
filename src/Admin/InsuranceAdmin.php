@@ -3,24 +3,22 @@
 namespace App\Admin;
 
 use App\Entity\Insurance;
-use App\Entity\Personnel;
+use App\Entity\Club;
 use Sonata\AdminBundle\Admin\AbstractAdmin;
 use Sonata\AdminBundle\Datagrid\DatagridInterface;
 use Sonata\AdminBundle\Datagrid\DatagridMapper;
 use Sonata\AdminBundle\Datagrid\ListMapper;
-use Sonata\AdminBundle\FieldDescription\FieldDescriptionInterface;
 use Sonata\AdminBundle\Form\FormMapper;
 use Sonata\AdminBundle\Form\Type\ModelAutocompleteType;
 use Sonata\AdminBundle\Form\Type\ModelListType;
 use Sonata\AdminBundle\Route\RouteCollectionInterface;
 use Sonata\AdminBundle\Show\ShowMapper;
 use Sonata\DoctrineORMAdminBundle\Filter\DateTimeFilter;
-use Sonata\DoctrineORMAdminBundle\Filter\ModelAutocompleteFilter;
 use Sonata\DoctrineORMAdminBundle\Filter\ModelFilter;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Sonata\Form\Validator\ErrorElement;
 use Sonata\Form\Type\DatePickerType;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
@@ -29,8 +27,11 @@ final class InsuranceAdmin extends AbstractAdmin
 
     private $ts;
 
-    public function __construct(TokenStorageInterface $ts)
+    private $container;
+
+    public function __construct(TokenStorageInterface $ts, ContainerInterface $containerInterface)
     {
+        $this->container = $containerInterface;
         $this->ts = $ts;
     }
 
@@ -43,6 +44,10 @@ final class InsuranceAdmin extends AbstractAdmin
 
     protected function prePersist(object $object): void
     {
+        $fileUploader = $this->container->get('App\Service\FileUploader');
+        if ($object->getPdfFile()) {
+            $object->setPdfNom($fileUploader->upload($object->getPdfFile(), 2));
+        }
         $user = $this->ts->getToken()->getUser();
         $object->setDateCreated(new \DateTimeImmutable());
         $object->setStatus(1);
@@ -51,7 +56,10 @@ final class InsuranceAdmin extends AbstractAdmin
 
     protected function preUpdate(object $object): void
     {
-      
+        $fileUploader = $this->container->get('App\Service\FileUploader');
+        if ($object->getPdfFile()) {
+            $object->setPdfNom($fileUploader->upload($object->getPdfFile(), 2));
+        }
     }
 
     public function validate(ErrorElement $errorElement, $object)
@@ -67,6 +75,18 @@ final class InsuranceAdmin extends AbstractAdmin
 
     protected function configureFormFields(FormMapper $form): void
     {
+        $insurance = $this->getSubject();
+
+        // use $fileFormOptions so we can add other options to the field
+        $fileFormFOptions = ['required' => false];
+
+        if ($insurance && ($webPath = $insurance->getPdfWebPath())) {
+            // get the request so the full path to the image can be set
+            $fullPath = $insurance->getPdfAbsolutePath();
+            // add a 'help' option containing the preview's img tag
+            $fileFormFOptions['help'] = is_file($fullPath) ? '<a href="' . $webPath . '">Click to download</a>' : 'copie mumerique non disponible';
+            $fileFormFOptions['help_html'] = true;
+        }
 
         $form->tab("Assurance")
                 ->with("Details", ['class' => 'col-md-8'])
@@ -87,11 +107,12 @@ final class InsuranceAdmin extends AbstractAdmin
                         'choice_translation_domain' => 'App',
                         'label' => "Type d'assurance"
                     ])
-                    ->add('personnel', ModelListType::class, [
+                    ->add('club', ModelListType::class, [
                         'class' => Personnel::class,
                         'label' => "Personne concerne",
                         'btn_delete' => false,
                         ])
+                    ->add('pdfFile', FileType::class, $fileFormFOptions)
                 ->end()
             ->end();
     }
@@ -99,7 +120,7 @@ final class InsuranceAdmin extends AbstractAdmin
     protected function configureListFields(ListMapper $list): void
     {
         $list->addIdentifier('id', null, ['label'=>'ID'])
-            ->add('personnel.fullName', null, ['label'=>'Nom du concerne'])
+            ->add('club.nom', null, ['label'=>'Nom du club'])
             ->add('deliveredBy', null, ['label'=>'Delivre Par'])
             ->add('dateDelivrance', null, ['label'=>'Delivre le'])
             ->add('dateExpiration', null, ['label'=>'Expire le'])
@@ -129,7 +150,8 @@ final class InsuranceAdmin extends AbstractAdmin
                 ->add('deliveredBy', null, array('label' => 'Delivre par'))
                 ->add('deliveredAt', null, array('label' => 'Delivre a'))
                 ->add('typeAssurance', null, ['label' => "Type d'assurance"])
-                ->add('personnel', null, ['label' => "Personne concerne"])
+                ->add('club', null, ['label' => "Personne concerne"])
+                ->add('pdfFileFromName', 'file', ['label'=>'Copie electronique'])
             ->end()
         ->end();
     }
@@ -152,9 +174,9 @@ final class InsuranceAdmin extends AbstractAdmin
             ->add('deliveredAt', null, array('label' => 'Delivre a'))
             ->add('dateDelivrance', DateTimeFilter::class, array('label' => 'Date de delivrance'))
             ->add('dateExpiration', DateTimeFilter::class, array('label' => 'Date expiration'))
-            ->add('personnel', ModelFilter::class, [
+            ->add('club', ModelFilter::class, [
                 'field_type' => ModelAutocompleteType::class,
-                'label' => 'Personne',
+                'label' => 'Club',
                 'field_options' => ['property'=>'nom'],
             ]);
     }

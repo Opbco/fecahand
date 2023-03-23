@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\InsuranceRepository;
+use App\Trait\PdfTrait;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -10,6 +11,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: InsuranceRepository::class)]
 class Insurance
 {
+    use PdfTrait;
+    
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -49,7 +52,7 @@ class Insurance
 
     #[ORM\ManyToOne(inversedBy: 'insurances')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Personnel $personnel = null;
+    private ?Club $club = null;
 
     public function getId(): ?int
     {
@@ -164,14 +167,14 @@ class Insurance
         return $this;
     }
 
-    public function getPersonnel(): ?Personnel
+    public function getClub(): ?Club
     {
-        return $this->personnel;
+        return $this->club;
     }
 
-    public function setPersonnel(?Personnel $personnel): self
+    public function setClub(?Club $club): self
     {
-        $this->personnel = $personnel;
+        $this->club = $club;
 
         return $this;
     }

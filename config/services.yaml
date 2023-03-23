@@ -54,6 +54,7 @@ services:
         calls:
             - [addChild, ['@admin.clubstade', 'club']]
             - [addChild, ['@admin.affiliation', 'club']]
+            - [addChild, ['@admin.insurance', 'club']]
             - [setTranslationDomain, ['App']]
     
     admin.clubstade:
@@ -103,7 +104,6 @@ services:
             - [addChild, ['@admin.personnel_position', 'personnel']]
             - [addChild, ['@admin.diplome', 'personne']]
             - [addChild, ['@admin.aptitude', 'personne']]
-            - [addChild, ['@admin.insurance', 'personnel']]
             - [addChild, ['@admin.contrat', 'personnel']]
             - [setTranslationDomain, ['App']]
 

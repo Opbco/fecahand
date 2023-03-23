@@ -108,9 +108,6 @@ class Personnel
     #[ORM\OneToMany(mappedBy: 'personnel', targetEntity: Licence::class, orphanRemoval: true)]
     private Collection $licences;
 
-    #[ORM\OneToMany(mappedBy: 'personnel', targetEntity: Insurance::class, orphanRemoval: true)]
-    private Collection $insurances;
-
     #[Assert\File(maxSize: '4096k', maxSizeMessage: 'Image trop lourde, maximum 4Mo', mimeTypes:['image/jpg', 'image/jpeg', 'image/gif', 'image/png'], mimeTypesMessage:'seule les fichiers jpg, jpeg, png et gif sont acceptes')]
     private ?UploadedFile $imageFile = null;
 
@@ -148,7 +145,6 @@ class Personnel
     {
         $this->contrats = new ArrayCollection();
         $this->licences = new ArrayCollection();
-        $this->insurances = new ArrayCollection();
         $this->certificatAptitudes = new ArrayCollection();
         $this->diplomes = new ArrayCollection();
         $this->personnelPositions = new ArrayCollection();
@@ -453,36 +449,6 @@ class Personnel
             // set the owning side to null (unless already changed)
             if ($licence->getPersonnel() === $this) {
                 $licence->setPersonnel(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Insurance>
-     */
-    public function getInsurances(): Collection
-    {
-        return $this->insurances;
-    }
-
-    public function addInsurance(Insurance $insurance): self
-    {
-        if (!$this->insurances->contains($insurance)) {
-            $this->insurances->add($insurance);
-            $insurance->setPersonnel($this);
-        }
-
-        return $this;
-    }
-
-    public function removeInsurance(Insurance $insurance): self
-    {
-        if ($this->insurances->removeElement($insurance)) {
-            // set the owning side to null (unless already changed)
-            if ($insurance->getPersonnel() === $this) {
-                $insurance->setPersonnel(null);
             }
         }
 

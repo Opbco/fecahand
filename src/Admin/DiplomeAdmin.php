@@ -68,8 +68,6 @@ final class DiplomeAdmin extends AbstractAdmin
         $fileFormFOptions = ['required' => false];
 
         if ($diplome && ($webPath = $diplome->getPdfWebPath())) {
-            // get the request so the full path to the image can be set
-            $request = $this->getRequest();
             $fullPath = $diplome->getPdfAbsolutePath();
             // add a 'help' option containing the preview's img tag
             $fileFormFOptions['help'] = is_file($fullPath) ? '<a href="' . $webPath . '">Click to download</a>' : 'copie mumerique non disponible';
