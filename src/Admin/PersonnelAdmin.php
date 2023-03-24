@@ -217,27 +217,6 @@ final class PersonnelAdmin extends AbstractAdmin
                         'sortable' => 'position',
                     ])
                 ->end()
-                ->with('Assurance', ['class' => 'col-md-12'])
-                    ->add('insurances', CollectionType::class, [
-                        'type_options' => [
-                            // Prevents the "Delete" option from being displayed
-                            'delete' => true,
-                            'delete_options' => [
-                                // You may otherwise choose to put the field but hide it
-                                'type'         => CheckboxType::class,
-                                // In that case, you need to fill in the options as well
-                                'type_options' => [
-                                    'mapped'   => false,
-                                    'required' => false,
-                                ]
-                            ]
-                        ]
-                    ], [
-                        'edit' => 'inline',
-                        'inline' => 'table',
-                        'sortable' => 'position',
-                    ])
-                ->end()
             ->end();
          }
 

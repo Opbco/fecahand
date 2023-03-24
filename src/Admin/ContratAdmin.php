@@ -41,7 +41,7 @@ final class ContratAdmin extends AbstractAdmin
     public function toString(object $object): string
     {
         return $object instanceof Insurance
-            ? 'Contrat ' . $object->getPersonnel()
+            ? 'Contrat ' . $object->getClub()
             : 'Contrat'; // shown in the breadcrumb on the create view
     }
 

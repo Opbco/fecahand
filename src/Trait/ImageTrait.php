@@ -33,6 +33,11 @@ trait ImageTrait
         return $this->getUploadImageDir().'/'.$this->imageNom;
     }
 
+    public function getAvatarWebPath(): string
+    {
+        return $this->getImageWebPath();
+    }
+
     public function getImageAbsolutePath()
     {
         return null === $this->imageNom

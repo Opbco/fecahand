@@ -13,13 +13,16 @@ use Sonata\AdminBundle\Datagrid\DatagridMapper;
 use Sonata\AdminBundle\Datagrid\ListMapper;
 use Sonata\AdminBundle\FieldDescription\FieldDescriptionInterface;
 use Sonata\AdminBundle\Form\FormMapper;
+use Sonata\AdminBundle\Form\Type\Filter\ChoiceType;
 use Sonata\AdminBundle\Show\ShowMapper;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Sonata\Form\Validator\ErrorElement;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType as TypeChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\ColorType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 final class ClubAdmin extends AbstractAdmin
@@ -89,7 +92,7 @@ final class ClubAdmin extends AbstractAdmin
         if ($club && ($webPath = $club->getImageWebPath())) {
             $fullPath = $club->getImageAbsolutePath() . $webPath;
             // add a 'help' option containing the preview's img tag
-            $fileFormOptions['help'] = '<img style="max-width:100%; width:200px; aspect-ratio:1; object-fit:contain;" src="' . $fullPath . '" class="admin-preview"/>';
+            $fileFormOptions['help'] = '<img style="max-width:100%; width:200px; aspect-ratio:1; object-fit:contain;" src="' . $webPath . '" class="admin-preview"/>';
             $fileFormOptions['help_html'] = true;
             $fileFormOptions['label'] = 'Logo';
         }
@@ -101,13 +104,14 @@ final class ClubAdmin extends AbstractAdmin
             // add a 'help' option containing the preview's img tag
             $fileFormFOptions['help'] = is_file($fullPath) ? '<a href="' . $webPath . '">Click to download</a>' : 'copie mumerique non disponible';
             $fileFormFOptions['help_html'] = true;
+            $fileFormFOptions['label'] = 'copie des status du club';
         }
 
         $form->tab('Club')
                 ->with('Informations', ['class' => 'col-md-6'])
                     ->add('imageFile', FileType::class, $fileFormOptions)
                     ->add('nom', TextType::class)
-                    ->add('status', ChoiceType::class, array('choices'=> Club::getGenreCodes(), 'label' => 'Genre', 'required' => true))
+                    ->add('status', TypeChoiceType::class, array('choices'=> Club::getGenreCodes(), 'label' => 'Genre', 'required' => true))
                     ->add('dateCreation', DateType::class, ['label'=>'Date de creation'])
                     ->add('couleurs', CollectionType::class, [
                         'entry_type' => ColorType::class,
@@ -163,10 +167,10 @@ final class ClubAdmin extends AbstractAdmin
         }
 
         $show->tab('Club')
-                ->with('Informations', ['class' => 'col-md-6'])
+                ->with('Informations', ['class' => 'col-md-8'])
                     ->add('imageFileFromName', 'file', $fileFormOptions)
                     ->add('nom', null, ['label' => 'Nom'])
-                    ->add('genre', null, ['label' => "Gemre"])
+                    ->add('genre', null, ['label' => "Genre"])
                     ->add('dateCreation', null, ['label'=>'Date de creation'])
                     ->add('couleurs')
                     ->add('devise', null, array('label' => 'Devise'))
@@ -174,7 +178,7 @@ final class ClubAdmin extends AbstractAdmin
                     ->add('datePublication',null, ['label'=>'Date de publication'])
                     ->add('pdfFileFromName', 'file', ['label'=>'Copie electronique'])
                 ->end()
-                ->with('Localisation', ['class' => 'col-md-6'])
+                ->with('Localisation', ['class' => 'col-md-4'])
                     ->add('address', null, ['label' => 'Adresse'])
                     ->add('latitude', null, ['label' => 'Latitude'])
                     ->add('longitude', null, ['label' => 'Longitude'])

@@ -19,9 +19,9 @@ class Club extends ItemBureau
     use LocationTrait;
     use PdfTrait;
 
-    const GENDER_MALE = 1;
-    const GENDER_FEMALE = 2;
-    const GENDER_MIX = 3;
+    const GENDER_MALE = 0;
+    const GENDER_FEMALE = 1;
+    const GENDER_MIX = 2;
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -40,7 +40,7 @@ class Club extends ItemBureau
     private array $couleurs = [];
 
     #[ORM\Column(type: Types::SMALLINT)]
-    #[Assert\Positive]
+    #[Assert\NotBlank]
     private ?int $genre = null;
 
     #[ORM\Column(length: 255)]
@@ -94,15 +94,15 @@ class Club extends ItemBureau
     }
 
     public static $genderCodes = array(
-        "Homme" => Gender::GENDER_MALE,
-        "Femme" => Gender::GENDER_FEMALE,
-        "Mix" => Gender::GENDER_MIX
+        "Homme" => Club::GENDER_MALE,
+        "Femme" => Club::GENDER_FEMALE,
+        "Mix" => Club::GENDER_MIX
     );
 
     public static $codesGender = array(
-        Gender::GENDER_MALE => "Homme",
-        Gender::GENDER_FEMALE => "Femme",
-        Gender::GENDER_MIX => "Mix"
+        Club::GENDER_MALE => "Homme",
+        Club::GENDER_FEMALE => "Femme",
+        Club::GENDER_MIX => "Mix"
     );
 
     public function getId(): ?int

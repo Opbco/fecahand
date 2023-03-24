@@ -155,3 +155,18 @@ services:
             - [setTranslationDomain, ['App']]
         tags:
             - { name: sonata.admin, model_class: App\Entity\DisciplineRegles, manager_type: orm, group: Discipline Affinitaire, label: Disciplines et regles }
+
+    admin.bureau:
+        class: App\Admin\BureauAdmin
+        tags:
+            - { name: sonata.admin, model_class: App\Entity\Bureau, group: Bureaux, icon: 'fas fa-cash-register',  manager_type: orm, label: Bureaux }
+        calls:
+            - [addChild, ['@admin.bureau_position', 'bureau']]
+            - [setTranslationDomain, ['App']]
+
+    admin.bureau_position:
+        class: App\Admin\BureauPositionAdmin
+        calls:
+            - [setTranslationDomain, ['App']]
+        tags:
+            - { name: sonata.admin, model_class: App\Entity\BureauPosition, manager_type: orm, group: Bureaux, label: Bureaux et Positions }
