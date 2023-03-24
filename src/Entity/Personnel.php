@@ -135,6 +135,9 @@ class Personnel
     #[ORM\OneToMany(mappedBy: 'personnel', targetEntity: PersonnelPosition::class, orphanRemoval: true, cascade: ['persist', 'remove'])]
     private Collection $personnelPositions;
 
+    #[ORM\OneToMany(mappedBy: 'personne', targetEntity: BureauPersonnes::class, orphanRemoval: true)]
+    private Collection $bureauPersonnes;
+
 
     public function __toString()
     {
@@ -148,6 +151,7 @@ class Personnel
         $this->certificatAptitudes = new ArrayCollection();
         $this->diplomes = new ArrayCollection();
         $this->personnelPositions = new ArrayCollection();
+        $this->bureauPersonnes = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -696,6 +700,36 @@ class Personnel
             // set the owning side to null (unless already changed)
             if ($personnelPosition->getPersonnel() === $this) {
                 $personnelPosition->setPersonnel(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, BureauPersonnes>
+     */
+    public function getBureauPersonnes(): Collection
+    {
+        return $this->bureauPersonnes;
+    }
+
+    public function addBureauPersonne(BureauPersonnes $bureauPersonne): self
+    {
+        if (!$this->bureauPersonnes->contains($bureauPersonne)) {
+            $this->bureauPersonnes->add($bureauPersonne);
+            $bureauPersonne->setPersonne($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBureauPersonne(BureauPersonnes $bureauPersonne): self
+    {
+        if ($this->bureauPersonnes->removeElement($bureauPersonne)) {
+            // set the owning side to null (unless already changed)
+            if ($bureauPersonne->getPersonne() === $this) {
+                $bureauPersonne->setPersonne(null);
             }
         }
 

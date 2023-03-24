@@ -7,7 +7,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use phpDocumentor\Reflection\Types\Nullable;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: BureauRepository::class)]
@@ -23,21 +22,26 @@ class Bureau
     private ?string $nom = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
-    #[Assert\DateTime]
+    #[Assert\Type('dateTime')]
     private ?\DateTimeInterface $dateElection = null;
 
     #[ORM\Column]
     private ?bool $actif = null;
 
-    #[ORM\OneToOne(mappedBy: 'bureau', cascade: ['persist', 'remove'])]
+    #[ORM\OneToOne(targetEntity: ItemBureau::class, cascade:['persist'])]
+    #[ORM\JoinColumn(name:'item_id', referencedColumnName:'id')]
     private ?ItemBureau $item = null;
 
-    #[ORM\OneToMany(mappedBy: 'bureau', targetEntity: BureauPosition::class, orphanRemoval: true, fetch:"EXTRA_LAZY")]
+    #[ORM\OneToMany(mappedBy: 'bureau', targetEntity: BureauPosition::class, orphanRemoval: true, fetch:"EXTRA_LAZY", cascade:['persist', 'remove'])]
     private Collection $positions;
+
+    #[ORM\OneToMany(mappedBy: 'bureau', targetEntity: BureauPersonnes::class, orphanRemoval: true)]
+    private Collection $personnes;
 
     public function __construct()
     {
         $this->positions = new ArrayCollection();
+        $this->personnes = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -145,5 +149,35 @@ class Bureau
     public function __toString()
     {
         return $this->getNom();
+    }
+
+    /**
+     * @return Collection<int, BureauPersonnes>
+     */
+    public function getPersonnes(): Collection
+    {
+        return $this->personnes;
+    }
+
+    public function addPersonne(BureauPersonnes $personne): self
+    {
+        if (!$this->personnes->contains($personne)) {
+            $this->personnes->add($personne);
+            $personne->setBureau($this);
+        }
+
+        return $this;
+    }
+
+    public function removePersonne(BureauPersonnes $personne): self
+    {
+        if ($this->personnes->removeElement($personne)) {
+            // set the owning side to null (unless already changed)
+            if ($personne->getBureau() === $this) {
+                $personne->setBureau(null);
+            }
+        }
+
+        return $this;
     }
 }

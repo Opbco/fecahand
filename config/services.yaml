@@ -161,7 +161,6 @@ services:
         tags:
             - { name: sonata.admin, model_class: App\Entity\Bureau, group: Bureaux, icon: 'fas fa-cash-register',  manager_type: orm, label: Bureaux }
         calls:
-            - [addChild, ['@admin.bureau_position', 'bureau']]
             - [setTranslationDomain, ['App']]
 
     admin.bureau_position:

@@ -3,14 +3,26 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\ORM\Mapping\MappedSuperclass;
 
-#[MappedSuperclass]
+#[ORM\Entity]
+#[ORM\InheritanceType('JOINED')]
+#[ORM\DiscriminatorColumn(name:'item_type', type:'string')]
+#[ORM\DiscriminatorMap(['one'=>'Club', 'two'=>'League', 'three'=>'DisciplineAffinitaire'])]
 class ItemBureau
 {
 
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column]
+    protected ?int $id = null;
+
     #[ORM\OneToOne(inversedBy: 'item', cascade: ['persist', 'remove'])]
-    private ?Bureau $bureau = null;
+    protected ?Bureau $bureau = null;
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
 
     public function getBureau(): ?Bureau
     {
@@ -22,6 +34,11 @@ class ItemBureau
         $this->bureau = $bureau;
 
         return $this;
+    }
+
+    public function __toString()
+    {
+        return $this->getBureau();
     }
 
 }

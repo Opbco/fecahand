@@ -15,11 +15,6 @@ class DisciplineAffinitaire extends ItemBureau
 {
     const TYPE_BALL = ['Rond', 'Oval', 'Plat'];
 
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
-
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
     private ?string $nom = null;
@@ -62,11 +57,6 @@ class DisciplineAffinitaire extends ItemBureau
     public function __construct()
     {
         $this->disciplineRegles = new ArrayCollection();
-    }
-
-    public function getId(): ?int
-    {
-        return $this->id;
     }
 
     public function getNom(): ?string

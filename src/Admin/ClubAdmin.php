@@ -3,6 +3,7 @@
 
 namespace App\Admin;
 
+use App\Entity\Bureau;
 use App\Entity\Club;
 use Knp\Menu\ItemInterface;
 use Oh\GoogleMapFormTypeBundle\Form\Type\GoogleMapType;
@@ -14,6 +15,7 @@ use Sonata\AdminBundle\Datagrid\ListMapper;
 use Sonata\AdminBundle\FieldDescription\FieldDescriptionInterface;
 use Sonata\AdminBundle\Form\FormMapper;
 use Sonata\AdminBundle\Form\Type\Filter\ChoiceType;
+use Sonata\AdminBundle\Form\Type\ModelType;
 use Sonata\AdminBundle\Show\ShowMapper;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Sonata\Form\Validator\ErrorElement;
@@ -128,8 +130,13 @@ final class ClubAdmin extends AbstractAdmin
                     ->add('datePublication', DateType::class, ['label'=>'Date de publication'])
                     ->add('pdfFile', FileType::class, $fileFormFOptions)
                 ->end()
-                ->with('Localisation', ['class' => 'col-md-6'])
+                ->with('Localisation et bureau', ['class' => 'col-md-6'])
                     ->add('latlng', GoogleMapType::class)
+                    ->add('bureau', ModelType::class, [
+                        'class' => Bureau::class,
+                        'property' => 'nom',
+                        'label' => "Mon bureau"
+                        ])
                 ->end()
             ->end();
          }
@@ -178,11 +185,12 @@ final class ClubAdmin extends AbstractAdmin
                     ->add('datePublication',null, ['label'=>'Date de publication'])
                     ->add('pdfFileFromName', 'file', ['label'=>'Copie electronique'])
                 ->end()
-                ->with('Localisation', ['class' => 'col-md-4'])
+                ->with('Localisation et Bureau', ['class' => 'col-md-4'])
                     ->add('address', null, ['label' => 'Adresse'])
                     ->add('latitude', null, ['label' => 'Latitude'])
                     ->add('longitude', null, ['label' => 'Longitude'])
                     ->add('status', null, array('label' => 'Statut'))
+                    ->add('bureau', null, ['label' => "Nom du bureau"])
                 ->end()
             ->end();
     }

@@ -23,11 +23,6 @@ class Club extends ItemBureau
     const GENDER_FEMALE = 1;
     const GENDER_MIX = 2;
 
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
-
     #[ORM\Column(length: 255)]
     #[Assert\Length(min: 10)]
     private ?string $nom = null;
@@ -104,11 +99,6 @@ class Club extends ItemBureau
         Club::GENDER_FEMALE => "Femme",
         Club::GENDER_MIX => "Mix"
     );
-
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
 
     public function getNom(): ?string
     {

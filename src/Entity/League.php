@@ -12,11 +12,6 @@ class League extends ItemBureau
 {
     const TYPE_LEAGUE = ['Specialisee', 'Regionale', 'Departementale'];
 
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
-
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
     private ?string $nom = null;
@@ -44,11 +39,6 @@ class League extends ItemBureau
     #[ORM\Column(type: 'boolean', nullable: false, options: ['default' => 0])]
     #[Assert\NotNull]
     private ?bool $active = null;
-
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
 
     public function getNom(): ?string
     {

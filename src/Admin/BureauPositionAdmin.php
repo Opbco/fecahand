@@ -7,9 +7,9 @@ use Sonata\AdminBundle\Admin\AbstractAdmin;
 use Sonata\AdminBundle\Datagrid\DatagridMapper;
 use Sonata\AdminBundle\Datagrid\ListMapper;
 use Sonata\AdminBundle\Form\FormMapper;
-use Sonata\AdminBundle\Form\Type\NumberType;
-use Sonata\AdminBundle\Route\RouteCollectionInterface;
+use Sonata\AdminBundle\Form\Type\ModelAutocompleteType;
 use Sonata\DoctrineORMAdminBundle\Filter\ModelAutocompleteFilter;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 
 final class BureauPositionAdmin extends AbstractAdmin
 {
@@ -78,13 +78,4 @@ final class BureauPositionAdmin extends AbstractAdmin
         
     }
 
-    protected function configureRoutes(RouteCollectionInterface $collection): void
-    {
-        if ($this->isChild()) {
-            return;
-        }
-
-        // This is the route configuration as a parent
-        $collection->clearExcept(['list']);
-    }
 }

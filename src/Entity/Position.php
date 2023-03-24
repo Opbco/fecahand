@@ -40,10 +40,14 @@ class Position
     #[ORM\OneToMany(mappedBy: 'position', targetEntity: PersonnelPosition::class, orphanRemoval: true)]
     private Collection $positionPersonnels;
 
+    #[ORM\OneToMany(mappedBy: 'position', targetEntity: BureauPersonnes::class)]
+    private Collection $bureauPersonnes;
+
     public function __construct()
     {
         $this->bureaux = new ArrayCollection();
         $this->positionPersonnels = new ArrayCollection();
+        $this->bureauPersonnes = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -160,6 +164,36 @@ class Position
     public function setPositionPersonnels(Collection $positionPersonnels)
     {
         $this->positionPersonnels = $positionPersonnels;
+    }
+
+    /**
+     * @return Collection<int, BureauPersonnes>
+     */
+    public function getBureauPersonnes(): Collection
+    {
+        return $this->bureauPersonnes;
+    }
+
+    public function addBureauPersonne(BureauPersonnes $bureauPersonne): self
+    {
+        if (!$this->bureauPersonnes->contains($bureauPersonne)) {
+            $this->bureauPersonnes->add($bureauPersonne);
+            $bureauPersonne->setPosition($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBureauPersonne(BureauPersonnes $bureauPersonne): self
+    {
+        if ($this->bureauPersonnes->removeElement($bureauPersonne)) {
+            // set the owning side to null (unless already changed)
+            if ($bureauPersonne->getPosition() === $this) {
+                $bureauPersonne->setPosition(null);
+            }
+        }
+
+        return $this;
     }
 
 }
