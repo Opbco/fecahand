@@ -22,23 +22,23 @@ class Saison
     private ?string $nom = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
-    #[Assert\DateTime]
+    #[Assert\Type('datetime')]
     private ?\DateTimeInterface $dateDebut = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
-    #[Assert\DateTime]
+    #[Assert\Type('datetime')]
     private ?\DateTimeInterface $DateFin = null;
 
     #[ORM\Column]
-    #[Assert\Currency]
+    #[Assert\PositiveOrZero]
     private ?float $montantAffiliation = null;
 
     #[ORM\Column]
-    #[Assert\Currency]
+    #[Assert\PositiveOrZero]
     private ?float $montantLicenceJoueur = null;
 
     #[ORM\Column]
-    #[Assert\Currency]
+    #[Assert\PositiveOrZero]
     private ?float $montantLicenceArbitre = null;
 
     #[ORM\ManyToOne(inversedBy: 'saisons')]
@@ -50,19 +50,23 @@ class Saison
     private ?User $userUpdated = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, options:['default' => 'CURRENT_TIMESTAMP'])]
-    #[Assert\DateTime]
+    #[Assert\Type('datetime')]
     private ?\DateTimeInterface $dateCreated = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, options:['default' => 'CURRENT_TIMESTAMP'])]
-    #[Assert\DateTime]
+    #[Assert\Type('datetime')]
     private ?\DateTimeInterface $dateUpdated = null;
 
     #[ORM\OneToMany(mappedBy: 'saison', targetEntity: Licence::class, orphanRemoval: true)]
     private Collection $licences;
 
+    #[ORM\OneToMany(mappedBy: 'saison', targetEntity: Affiliation::class, orphanRemoval: true)]
+    private Collection $affiliations;
+
     public function __construct()
     {
         $this->licences = new ArrayCollection();
+        $this->affiliations = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -218,5 +222,40 @@ class Saison
         }
 
         return $this;
+    }
+
+    /**
+     * @return Collection<int, Affiliation>
+     */
+    public function getAffiliations(): Collection
+    {
+        return $this->affiliations;
+    }
+
+    public function addAffiliation(Affiliation $affiliation): self
+    {
+        if (!$this->affiliations->contains($affiliation)) {
+            $this->affiliations->add($affiliation);
+            $affiliation->setSaison($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAffiliation(Affiliation $affiliation): self
+    {
+        if ($this->affiliations->removeElement($affiliation)) {
+            // set the owning side to null (unless already changed)
+            if ($affiliation->getSaison() === $this) {
+                $affiliation->setSaison(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function __toString()
+    {
+        return $this->getNom();
     }
 }

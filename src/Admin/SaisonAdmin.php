@@ -3,29 +3,28 @@
 namespace App\Admin;
 
 use App\Entity\Saison;
+use Knp\Menu\ItemInterface;
 use Sonata\AdminBundle\Admin\AbstractAdmin;
+use Sonata\AdminBundle\Admin\AdminInterface;
 use Sonata\AdminBundle\Datagrid\DatagridInterface;
 use Sonata\AdminBundle\Datagrid\DatagridMapper;
 use Sonata\AdminBundle\Datagrid\ListMapper;
 use Sonata\AdminBundle\Form\FormMapper;
-use Sonata\AdminBundle\Form\Type\ModelListType;
-use Sonata\AdminBundle\Form\Type\ModelType;
 use Sonata\AdminBundle\Show\ShowMapper;
 use Sonata\DoctrineORMAdminBundle\Filter\DateTimeFilter;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Sonata\Form\Validator\ErrorElement;
 use Sonata\Form\Type\DatePickerType;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 final class SaisonAdmin extends AbstractAdmin
 {
-    private $container;
+    private $ts;
 
-    public function __construct(ContainerInterface $containerInterface)
+    public function __construct(TokenStorageInterface $ts)
     {
-        $this->container = $containerInterface;
+        $this->ts = $ts;
     }
 
     public function toString(object $object): string
@@ -50,6 +49,13 @@ final class SaisonAdmin extends AbstractAdmin
         $object->setDateCreated(new \DateTimeImmutable());
         $object->setUserCreated($user);
     }
+
+    protected function preUpdate(object $object): void
+    {
+        $user = $this->ts->getToken()->getUser();
+        $object->setDateUpdated(new \DateTimeImmutable());
+        $object->setUserUpdated($user);
+    }
 	
     protected function configureFormFields(FormMapper $form): void
     {
@@ -64,28 +70,9 @@ final class SaisonAdmin extends AbstractAdmin
 	                'label' => 'Date de fin de saison',
 	                'required' => true
 	            ])
-				->add('montantAffiliation', FloatType::class, array('label' => "Montant de l'affiliation (Fcfa)", 'required' => true))
-				->add('montantLicenceJoueur', FloatType::class, array('label' => 'Montant de la licence du joueur (Fcfa)', 'required' => true))
-				->add('montantLicenceArbitre', FloatType::class, array('label' => "Montant de la licence de l'arbitre (Fcfa)", 'required' => true))				
-				->add('licences', CollectionType::class, [
-					'type_options' => [
-						// Prevents the "Delete" option from being displayed
-						'delete' => true,
-						'delete_options' => [
-							// You may otherwise choose to put the field but hide it
-							'type'         => CheckboxType::class,
-							// In that case, you need to fill in the options as well
-							'type_options' => [
-								'mapped'   => false,
-								'required' => false,
-							]
-						]
-					]
-				], [
-					'edit' => 'inline',
-					'inline' => 'table',
-					'sortable' => 'position',
-				])				
+				->add('montantAffiliation', NumberType::class, array('label' => "Montant de l'affiliation (Fcfa)", 'required' => true))
+				->add('montantLicenceJoueur', NumberType::class, array('label' => 'Montant de la licence du joueur (Fcfa)', 'required' => true))
+				->add('montantLicenceArbitre', NumberType::class, array('label' => "Montant de la licence de l'arbitre (Fcfa)", 'required' => true))								
 			->end()			
 		->end();
     }
@@ -98,12 +85,24 @@ final class SaisonAdmin extends AbstractAdmin
 			->add('DateFin', null, ['label' => 'Date de fin de saison'])
 			->add('montantAffiliation', null, ['label' => "Montant de l'affiliation (Fcfa)"])
 			->add('montantLicenceJoueur', null, ['label' => 'Montant de la licence du joueur (Fcfa)'])
-			->add('montantLicenceArbitre', null, ['label' => "Montant de la licence de l'arbitre (Fcfa)"]);
-    }
+			->add('montantLicenceArbitre', null, ['label' => "Montant de la licence de l'arbitre (Fcfa)"])
+			->add(ListMapper::NAME_ACTIONS, null, [
+                'actions' => [
+                    'delete' => [],
+                    'edit' => [
+                        'link_parameters' => [
+                            'full' => true,
+                        ]
+                    ],
+                ],
+                'row_align' => 'right'
+            ]);
+    
+		}
 
     protected function configureShowFields(ShowMapper $show): void
     {
-		$form->tab('Saison')
+		$show->tab('Saison')
 			->with("Details", ['class' => 'col-md-6'])
 				->add('nom', null, ['label' => 'Nom de la saison'])
 				->add('dateDebut', null, ['label' => 'Date de debut de saison'])
@@ -136,5 +135,26 @@ final class SaisonAdmin extends AbstractAdmin
 			->add('montantLicenceJoueur', null, ['label' => 'Montant de la licence du joueur (Fcfa)'])
 			->add('montantLicenceArbitre', null, ['label' => "Montant de la licence de l'arbitre (Fcfa)"]);
     }
+
+	protected function configureTabMenu(ItemInterface $menu, string $action, ?AdminInterface $childAdmin = null): void
+	{
+		if (!$childAdmin && !in_array($action, ['edit', 'show'])) {
+            return;
+        }
+
+        $admin = $this->isChild() ? $this->getParent() : $this;
+        $id = $admin->getRequest()->get('id');
+
+        $menu->addChild('Voir', $admin->generateMenuUrl('show', ['id' => $id]));
+
+        if ($this->isGranted('EDIT')) {
+            $menu->addChild('Modifier', $admin->generateMenuUrl('edit', ['id' => $id]));
+        }
+
+        if ($this->isGranted('LIST')) {
+            $menu->addChild('Affiliations', $admin->generateMenuUrl('admin.affiliation.list', ['id' => $id]));
+            $menu->addChild('Licences', $admin->generateMenuUrl('admin.licence.list', ['id' => $id]));
+        }
+	}
     
 }

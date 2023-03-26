@@ -47,7 +47,7 @@ final class PersonnelPositionAdmin extends AbstractAdmin
 
     protected function configureListFields(ListMapper $list): void
     {
-        $list->add('personnel')
+        $list->add('personnel.fullName')
              ->add('position')
              ->add(ListMapper::NAME_ACTIONS, null, [
                 'actions' => [

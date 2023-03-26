@@ -35,7 +35,7 @@ class Bureau
     #[ORM\OneToMany(mappedBy: 'bureau', targetEntity: BureauPosition::class, orphanRemoval: true, fetch:"EXTRA_LAZY", cascade:['persist', 'remove'])]
     private Collection $positions;
 
-    #[ORM\OneToMany(mappedBy: 'bureau', targetEntity: BureauPersonnes::class, orphanRemoval: true)]
+    #[ORM\OneToMany(mappedBy: 'bureau', targetEntity: BureauPersonnes::class, orphanRemoval: true, cascade:['persist', 'remove'])]
     private Collection $personnes;
 
     public function __construct()

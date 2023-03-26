@@ -15,6 +15,7 @@ use Sonata\AdminBundle\Datagrid\ListMapper;
 use Sonata\AdminBundle\FieldDescription\FieldDescriptionInterface;
 use Sonata\AdminBundle\Form\FormMapper;
 use Sonata\AdminBundle\Form\Type\Filter\ChoiceType;
+use Sonata\AdminBundle\Form\Type\ModelListType;
 use Sonata\AdminBundle\Form\Type\ModelType;
 use Sonata\AdminBundle\Show\ShowMapper;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -132,10 +133,11 @@ final class ClubAdmin extends AbstractAdmin
                 ->end()
                 ->with('Localisation et bureau', ['class' => 'col-md-6'])
                     ->add('latlng', GoogleMapType::class)
-                    ->add('bureau', ModelType::class, [
-                        'class' => Bureau::class,
-                        'property' => 'nom',
-                        'label' => "Mon bureau"
+                    ->add('bureau', ModelListType::class, [
+                        'btn_delete'    => false,
+                        ], [
+                        'label' => "Mon bureau",
+                        'placeholder' => 'Aucun bureau selectionne',
                         ])
                 ->end()
             ->end();

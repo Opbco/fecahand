@@ -41,6 +41,10 @@ class Affiliation extends Status
     #[ORM\JoinColumn(nullable: false)]
     private ?Club $club = null;
 
+    #[ORM\ManyToOne(inversedBy: 'affiliations')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Saison $saison = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -114,6 +118,18 @@ class Affiliation extends Status
     public function setClub(?Club $club): self
     {
         $this->club = $club;
+
+        return $this;
+    }
+
+    public function getSaison(): ?Saison
+    {
+        return $this->saison;
+    }
+
+    public function setSaison(?Saison $saison): self
+    {
+        $this->saison = $saison;
 
         return $this;
     }

@@ -102,10 +102,19 @@ services:
             - { name: sonata.admin, model_class: App\Entity\Personnel, group: Acteurs, icon: 'fas fa-users-cog',  manager_type: orm, label: Personnes }
         calls:
             - [addChild, ['@admin.personnel_position', 'personnel']]
+            - [addChild, ['@admin.licence', 'personnel']]
             - [addChild, ['@admin.diplome', 'personne']]
             - [addChild, ['@admin.aptitude', 'personne']]
             - [addChild, ['@admin.contrat', 'personnel']]
             - [setTranslationDomain, ['App']]
+
+    admin.licence:
+        class: App\Admin\LicenceAdmin
+        calls:
+            - [setTranslationDomain, ['App']]
+        tags:
+            - { name: sonata.admin, model_class: App\Entity\Licence, manager_type: orm, group: Acteurs, label: Licences }
+
 
     admin.contrat:
         class: App\Admin\ContratAdmin
@@ -162,6 +171,7 @@ services:
             - { name: sonata.admin, model_class: App\Entity\Bureau, group: Bureaux, icon: 'fas fa-cash-register',  manager_type: orm, label: Bureaux }
         calls:
             - [setTranslationDomain, ['App']]
+            - [addChild, ['@admin.bureau_personnes', 'bureau']]
 
     admin.bureau_position:
         class: App\Admin\BureauPositionAdmin
@@ -169,3 +179,19 @@ services:
             - [setTranslationDomain, ['App']]
         tags:
             - { name: sonata.admin, model_class: App\Entity\BureauPosition, manager_type: orm, group: Bureaux, label: Bureaux et Positions }
+
+    admin.bureau_personnes:
+        class: App\Admin\BureauPersonnesAdmin
+        calls:
+            - [setTranslationDomain, ['App']]
+        tags:
+            - { name: sonata.admin, model_class: App\Entity\BureauPersonnes, manager_type: orm, group: Bureaux, label: Bureaux et Personnes }
+
+    admin.saison:
+        class: App\Admin\SaisonAdmin
+        tags:
+            - { name: sonata.admin, model_class: App\Entity\Saison, group: Saison, icon: 'fas fa-users-cog',  manager_type: orm, label: Saisons }
+        calls:
+            - [addChild, ['@admin.affiliation', 'saison']]
+            - [addChild, ['@admin.licence', 'saison']]
+            - [setTranslationDomain, ['App']]

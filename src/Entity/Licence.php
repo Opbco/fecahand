@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: LicenceRepository::class)]
-class Licence
+class Licence extends Status
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -16,7 +16,7 @@ class Licence
     private ?int $id = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[Assert\DateTime]
+    #[Assert\Type('datetime')]
     private ?\DateTimeInterface $dateElaboration = null;
 
     #[ORM\Column(length: 255)]
@@ -28,11 +28,8 @@ class Licence
     private ?User $userCreated = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, options:['default' => 'CURRENT_TIMESTAMP'])]
-    #[Assert\DateTime]
+    #[Assert\Type('datetime')]
     private ?\DateTimeInterface $dateCreated = null;
-
-    #[ORM\Column]
-    private ?int $status = null;
 
     #[ORM\ManyToOne(inversedBy: 'licences')]
     #[ORM\JoinColumn(nullable: false)]
@@ -91,18 +88,6 @@ class Licence
     public function setDateCreated(\DateTimeInterface $dateCreated): self
     {
         $this->dateCreated = $dateCreated;
-
-        return $this;
-    }
-
-    public function getStatus(): ?int
-    {
-        return $this->status;
-    }
-
-    public function setStatus(int $status): self
-    {
-        $this->status = $status;
 
         return $this;
     }

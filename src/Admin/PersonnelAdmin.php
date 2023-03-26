@@ -360,6 +360,7 @@ final class PersonnelAdmin extends AbstractAdmin
         }
 
         if ($this->isGranted('LIST')) {
+            $menu->addChild('Licences', $admin->generateMenuUrl('admin.licence.list', ['id' => $id]));
             $menu->addChild('Positions', $admin->generateMenuUrl('admin.personnel_position.list', ['id' => $id]));
             $menu->addChild('Contrats', $admin->generateMenuUrl('admin.contrat.list', ['id' => $id]));
             $menu->addChild('Diplome', $admin->generateMenuUrl('admin.diplome.list', ['id' => $id]));

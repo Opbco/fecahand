@@ -3,7 +3,9 @@
 namespace App\Admin;
 
 use App\Entity\Bureau;
+use Knp\Menu\ItemInterface;
 use Sonata\AdminBundle\Admin\AbstractAdmin;
+use Sonata\AdminBundle\Admin\AdminInterface;
 use Sonata\AdminBundle\Datagrid\DatagridInterface;
 use Sonata\AdminBundle\Datagrid\DatagridMapper;
 use Sonata\AdminBundle\Datagrid\ListMapper;
@@ -122,6 +124,27 @@ final class BureauAdmin extends AbstractAdmin
     {
         $datagrid->add('nom', null, array('label' => 'Nom'))
             ->add('dateElection', DateTimeFilter::class, array('label' => 'Date dernieres elections'));
+    }
+
+
+    protected function configureTabMenu(ItemInterface $menu, string $action, ?AdminInterface $childAdmin = null): void
+    {
+        if (!$childAdmin && !in_array($action, ['edit', 'show'])) {
+            return;
+        }
+
+        $admin = $this->isChild() ? $this->getParent() : $this;
+        $id = $admin->getRequest()->get('id');
+
+        $menu->addChild('Voir', $admin->generateMenuUrl('show', ['id' => $id]));
+
+        if ($this->isGranted('EDIT')) {
+            $menu->addChild('Modifier', $admin->generateMenuUrl('edit', ['id' => $id]));
+        }
+
+        if ($this->isGranted('LIST')) {
+            $menu->addChild('Personnes', $admin->generateMenuUrl('admin.bureau_personnes.list', ['id' => $id]));
+        }
     }
 
 }
