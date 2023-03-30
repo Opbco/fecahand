@@ -195,3 +195,11 @@ services:
             - [addChild, ['@admin.affiliation', 'saison']]
             - [addChild, ['@admin.licence', 'saison']]
             - [setTranslationDomain, ['App']]
+
+    admin.league:
+        class: App\Admin\LeagueAdmin
+        tags:
+            - { name: sonata.admin, model_class: App\Entity\League, controller: ~, manager_type: orm, group: Saison, label: Ligues }
+        calls:
+            - [addChild, ['@admin.club', 'league']]
+            - [setTranslationDomain, ['App']]

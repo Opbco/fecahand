@@ -24,7 +24,7 @@ class DepartementAdmin extends AbstractAdmin {
     public function toString(object $object): string
     {
         return $object instanceof Departement
-            ? 'Departement ' . $object->getNom()
+            ? $object->getNom()
             : 'Departement'; // shown in the breadcrumb on the create view
     }
 

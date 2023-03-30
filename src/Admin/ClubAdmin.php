@@ -17,6 +17,7 @@ use Sonata\AdminBundle\Form\FormMapper;
 use Sonata\AdminBundle\Form\Type\Filter\ChoiceType;
 use Sonata\AdminBundle\Form\Type\ModelListType;
 use Sonata\AdminBundle\Form\Type\ModelType;
+use Sonata\AdminBundle\Route\RouteCollectionInterface;
 use Sonata\AdminBundle\Show\ShowMapper;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Sonata\Form\Validator\ErrorElement;
@@ -53,7 +54,6 @@ final class ClubAdmin extends AbstractAdmin
         $object->setDateCreated(new \DateTimeImmutable());
         $object->setDateUpdated(new \DateTimeImmutable());
         $object->setUserUpdated($user);
-        $object->setUserCreated($user);
         if ($object->getImageFile()) {
             $object->setImageNom($fileUploader->upload($object->getImageFile()));
         }
@@ -81,6 +81,9 @@ final class ClubAdmin extends AbstractAdmin
         $errorElement
             ->with('nom')
             ->assertNotBlank()
+            ->assertNotNull()
+            ->end()
+            ->with('userCreated')
             ->assertNotNull()
             ->end();
     }
@@ -133,12 +136,26 @@ final class ClubAdmin extends AbstractAdmin
                 ->end()
                 ->with('Localisation et bureau', ['class' => 'col-md-6'])
                     ->add('latlng', GoogleMapType::class)
+                ->end()
+                ->with('Administration', ['class' => 'col-md-6'])
+                    ->add('userCreated', ModelListType::class, [
+                        'btn_delete'    => false,
+                        'btn_add'    => false,
+                        'label' => "Compte Gestionnaire",
+                        ], [
+                        'placeholder' => 'Aucun Gestionnaire selectionne',
+                        ])
+                    ->add('league', ModelType::class, [
+                        'btn_delete'    => false,
+                        'btn_add'    => false,
+                        'label' => "Ligue",
+                        ])
                     ->add('bureau', ModelListType::class, [
                         'btn_delete'    => false,
                         ], [
                         'label' => "Mon bureau",
                         'placeholder' => 'Aucun bureau selectionne',
-                        ])
+                    ])
                 ->end()
             ->end();
          }
@@ -152,6 +169,8 @@ final class ClubAdmin extends AbstractAdmin
             ->add('devise', null, ['label'=>'Devise'])
             ->add('genre', FieldDescriptionInterface::TYPE_STRING, array('template' => '@SonataAdmin/CRUD/list_status_field.html.twig'))
             ->add('dateCreation', null, ['label'=>'Devise'])
+            ->add('league', null, ['label'=>'Ligue'])
+            ->add('userCreated', null, ['label'=>'Gestionnaire'])
             ->add(ListMapper::NAME_ACTIONS, null, [
                 'actions' => [
                     'show' => [],
@@ -192,6 +211,9 @@ final class ClubAdmin extends AbstractAdmin
                     ->add('latitude', null, ['label' => 'Latitude'])
                     ->add('longitude', null, ['label' => 'Longitude'])
                     ->add('status', null, array('label' => 'Statut'))
+                ->end()
+                ->with('Administration', ['class' => 'col-md-4'])
+                    ->add('league', null, ['label' => 'Ligue'])
                     ->add('bureau', null, ['label' => "Nom du bureau"])
                 ->end()
             ->end();
@@ -213,6 +235,7 @@ final class ClubAdmin extends AbstractAdmin
     {
         $datagrid->add('nom', null, array('label' => 'Nom'))
         ->add('dateCreation', null, array('label' => 'date de creation'))
+        ->add('league', null, array('label' => 'Ligue'))
         ->add('address', null, array('label' => 'Adresse'));
     }
 
@@ -235,6 +258,13 @@ final class ClubAdmin extends AbstractAdmin
             $menu->addChild('Stades', $admin->generateMenuUrl('admin.clubstade.list', ['id' => $id]));
             $menu->addChild('Affiliations', $admin->generateMenuUrl('admin.affiliation.list', ['id' => $id]));
             $menu->addChild('Assurances', $admin->generateMenuUrl('admin.insurance.list', ['id' => $id]));
+        }
+    }
+
+    protected function configureRoutes(RouteCollectionInterface $collection): void
+    {
+        if ($this->isChild()) {
+            return;
         }
     }
 }

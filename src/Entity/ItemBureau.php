@@ -38,7 +38,7 @@ class ItemBureau
 
     public function __toString()
     {
-        return $this->getBureau();
+        return $this->bureau? $this->getBureau():"League";
     }
 
 }

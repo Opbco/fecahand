@@ -24,7 +24,7 @@ final class BureauAdmin extends AbstractAdmin
     public function toString(object $object): string
     {
         return $object instanceof Bureau
-            ? 'Bureau ' . $object->getNom()
+            ? $object->getNom()
             : 'Bureau'; // shown in the breadcrumb on the create view
     }
 

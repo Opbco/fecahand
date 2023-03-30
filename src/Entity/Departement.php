@@ -63,7 +63,7 @@ class Departement
 
     public function __toString()
     {
-        return $this->getRegion().' '.$this->getNom();
+        return $this->getNom();
     }
 
     /**

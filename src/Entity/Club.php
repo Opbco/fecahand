@@ -100,6 +100,10 @@ class Club extends ItemBureau
         Club::GENDER_MIX => "Mix"
     );
 
+    #[ORM\ManyToOne(inversedBy: 'clubs')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?League $league = null;
+
     public function getNom(): ?string
     {
         return $this->nom;
@@ -374,6 +378,18 @@ class Club extends ItemBureau
                 $insurance->setClub(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getLeague(): ?League
+    {
+        return $this->league;
+    }
+
+    public function setLeague(?League $league): self
+    {
+        $this->league = $league;
 
         return $this;
     }

@@ -23,7 +23,7 @@ class RegionAdmin extends AbstractAdmin {
     public function toString(object $object): string
     {
         return $object instanceof Region
-            ? 'Region ' . $object->getNom()
+            ? $object->getNom()
             : 'Region'; // shown in the breadcrumb on the create view
     }
 
